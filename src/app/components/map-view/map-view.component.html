@@ -1,0 +1,68 @@
+<div class="map-container">
+  <mat-card class="map-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon fontIcon="location_on"></mat-icon>
+        Mapa de ubicaciones
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ locationCount() }} ubicación(es) registrada(s)
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="map-controls">
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="getCurrentLocation()"
+          class="location-btn"
+        >
+          <mat-icon fontIcon="my_location"></mat-icon>
+          <span>Mi ubicación</span>
+        </button>
+      </div>
+      <div class="map-wrapper">
+        <google-map
+          height="500px"
+          width="100%"
+          [center]="mapCenter()"
+          [zoom]="mapZoom()"
+          [options]="mapOptions"
+        >
+          @for (location of locations(); track location.id) {
+          <map-advanced-marker
+            [position]="{
+              lat: location.latitude,
+              lng: location.longitude
+            }"
+            [title]="getMarkerTitle(location)"
+            [options]="advancedMarkerOptions"
+            (mapClick)="onMarkerClick(location)"
+          >
+          </map-advanced-marker>
+          }
+        </google-map>
+
+        @if (locationCount() === 0) {
+        <div class="no-data">
+          <mat-icon fontIcon="location_off">location_off</mat-icon>
+          <p>No hay ubicaciones registradas</p>
+          <small>Registra la primera ubicación para verla en el mapa</small>
+        </div>
+        }
+      </div>
+
+      @if (locationCount() > 0) {
+      <div class="map-legend">
+        <h4>Leyenda</h4>
+        <div class="legend-item">
+          <mat-icon fontIcon="location_on" color="primary"></mat-icon>
+          <span>Ubicación de clase</span>
+        </div>
+        <small>Haz click en cualquier marcador para ver más detalles</small>
+      </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

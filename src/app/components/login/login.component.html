@@ -1,0 +1,210 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon fontIcon="location_on"></mat-icon>
+        {{ isLoginMode() ? "Iniciar Sesión" : "Crear Cuenta" }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{
+          isLoginMode()
+            ? "Accede a tu cuenta para continuar"
+            : "Crea una nueva cuenta"
+        }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (isLoginMode()) {
+      <form [formGroup]="loginForm" (ngSubmit)="onEmailLogin()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="ejemplo&#64;correo.com"
+          />
+          <mat-icon fontIcon="email" matSuffix></mat-icon>
+          @if (loginForm.get('email')?.invalid &&
+          loginForm.get('email')?.touched) {
+          <mat-error>
+            @if (loginForm.get('email')?.errors?.['required']) { El email es
+            requerido } @if (loginForm.get('email')?.errors?.['email']) { Email
+            inválido }
+          </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+            autocomplete="new-password"
+          />
+
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="togglePasswordVisibility()"
+            type="button"
+          >
+            <mat-icon
+              [fontIcon]="hidePassword() ? 'visibility_off' : 'visibility'"
+            ></mat-icon>
+          </button>
+          @if (loginForm.get('password')?.invalid &&
+          loginForm.get('password')?.touched) {
+          <mat-error>
+            @if (loginForm.get('password')?.errors?.['required']) { La
+            contraseña es requerida } @if
+            (loginForm.get('password')?.errors?.['minlength']) { Mínimo 6
+            caracteres }
+          </mat-error>
+          }
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="loginForm.invalid || authService.isLoading()"
+            class="full-width"
+          >
+            @if (authService.isLoading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+            <span>Iniciar Sesión</span>
+            }
+          </button>
+        </div>
+      </form>
+      } @if (!isLoginMode()) {
+      <form [formGroup]="signupForm" (ngSubmit)="onEmailSignup()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="ejemplo&#64;correo.com"
+            autocomplete="email"
+          />
+
+          <mat-icon fontIcon="email" matSuffix></mat-icon>
+          @if (signupForm.get('email')?.invalid &&
+          signupForm.get('email')?.touched) {
+          <mat-error>
+            @if (signupForm.get('email')?.errors?.['required']) { El email es
+            requerido } @if (signupForm.get('email')?.errors?.['email']) { Email
+            inválido }
+          </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="togglePasswordVisibility()"
+            type="button"
+          >
+            <mat-icon
+              [fontIcon]="hidePassword() ? 'visibility_off' : 'visibility'"
+            ></mat-icon>
+          </button>
+          @if (signupForm.get('password')?.invalid &&
+          signupForm.get('password')?.touched) {
+          <mat-error>
+            @if (signupForm.get('password')?.errors?.['required']) { La
+            contraseña es requerida } @if
+            (signupForm.get('password')?.errors?.['minlength']) { Mínimo 6
+            caracteres }
+          </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirmar contraseña</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+          />
+
+          @if (signupForm.get('confirmPassword')?.invalid &&
+          signupForm.get('confirmPassword')?.touched) {
+          <mat-error>
+            @if (signupForm.get('confirmPassword')?.errors?.['required']) {
+            Confirma tu contraseña }
+          </mat-error>
+          } @if (signupForm.errors?.['passwordMismatch'] &&
+          signupForm.get('confirmPassword')?.touched) {
+          <mat-error> Las contraseñas no coinciden </mat-error>
+          }
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="signupForm.invalid || authService.isLoading()"
+            class="full-width"
+          >
+            @if (authService.isLoading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+            <span>Crear cuenta</span>
+            }
+          </button>
+        </div>
+      </form>
+      }
+
+      <div class="divider">
+        <span>o</span>
+      </div>
+
+      <button
+        mat-raised-button
+        class="google-btn full-width"
+        (click)="onGoogleSignIn()"
+        [disabled]="authService.isLoading()"
+      >
+        <mat-icon fontIcon="account_circle"></mat-icon>
+        Continuar con Google
+      </button>
+
+      <div class="toggle-mode">
+        @if (isLoginMode()) {
+        <p>
+          ¿No tienes cuenta?
+          <button mat-button color="primary" (click)="toggleMode()">
+            Regístrate
+          </button>
+        </p>
+        } @else {
+        <p>
+          ¿Ya tienes cuenta?
+          <button mat-button color="primary" (click)="toggleMode()">
+            Inicia Sesión
+          </button>
+        </p>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,1 +1,83 @@
-/* You can add global styles to this file, and also import other style files */
+// Custom Theming for Angular Material
+// For more information: https://material.angular.dev/guide/theming
+@use "@angular/material" as mat;
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+} /* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Estilos personalizados para Bottom Sheet */
+.location-detail-panel .mat-mdc-bottom-sheet-container {
+  border-radius: 16px 16px 0 0;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Estilos para formularios */
+.mat-mdc-form-field {
+  margin-bottom: 16px;
+}
+
+/* Estilos para Google Maps */
+google-map {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+/* Spinner en botones */
+.mat-mdc-raised-button .mat-mdc-button-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Clases utilitarias */
+.full-width {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.margin-top {
+  margin-top: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mat-mdc-tab-header {
+    border-bottom: 1px solid #e0e0e0;
+  }
+}

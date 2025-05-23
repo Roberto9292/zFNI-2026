@@ -1,0 +1,160 @@
+<mat-card class="form-container">
+  <mat-card-header>
+    <mat-card-title>Registrar nueva ubicación</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="locationForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Materia</mat-label>
+          <input
+            matInput
+            formControlName="subject"
+            placeholder="Ej: Matemáticas"
+          />
+          @if (locationForm.get('subject')?.invalid &&
+          locationForm.get('subject')?.touched) {
+          <mat-error> La materia es requerida (mín. 2 caracteres) </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Docente</mat-label>
+          <input
+            matInput
+            formControlName="teacher"
+            placeholder="Ej: Juan Pérez"
+          />
+          @if (locationForm.get('teacher')?.invalid &&
+          locationForm.get('teacher')?.touched) {
+          <mat-error> El docente es requerido (mín. 2 caracteres) </mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Paralelo</mat-label>
+          <input
+            matInput
+            formControlName="parallel"
+            placeholder="Ej: A, B, C"
+          />
+          @if (locationForm.get('parallel')?.invalid &&
+          locationForm.get('parallel')?.touched) {
+          <mat-error> El paralelo es requerido </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Horario</mat-label>
+          <input
+            matInput
+            formControlName="schedule"
+            placeholder="Ej: 08:00 - 10:00"
+          />
+          @if (locationForm.get('schedule')?.invalid &&
+          locationForm.get('schedule')?.touched) {
+          <mat-error> El horario es requerido </mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Latitud</mat-label>
+          <input
+            matInput
+            formControlName="latitude"
+            type="number"
+            step="any"
+            readonly
+          />
+          @if (locationForm.get('latitude')?.invalid &&
+          locationForm.get('latitude')?.touched) {
+          <mat-error> La latitud es requerida </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Longitud</mat-label>
+          <input
+            matInput
+            formControlName="longitude"
+            type="number"
+            step="any"
+            readonly
+          />
+          @if (locationForm.get('longitude')?.invalid &&
+          locationForm.get('longitude')?.touched) {
+          <mat-error> La longitud es requerida </mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="map-section">
+        <div class="map-header">
+          <h3>Seleccionar ubicación en el mapa</h3>
+          <button
+            mat-raised-button
+            color="accent"
+            type="button"
+            (click)="getCurrentLocation()"
+          >
+            <mat-icon fontIcon="my_location"></mat-icon>
+            Mi ubicación
+          </button>
+        </div>
+
+        <google-map
+          height="300px"
+          width="100%"
+          [center]="center()"
+          [zoom]="zoom()"
+          (mapClick)="onMapClick($event)"
+        >
+          @if (markerPosition()) {
+          <map-marker
+            [position]="markerPosition()!"
+            [options]="{
+              title: 'Ubicación seleccionada',
+              draggable: true
+            }"
+          >
+          </map-marker>
+          }
+        </google-map>
+
+        <p class="map-instruction">
+          <mat-icon fontIcon="info"></mat-icon>
+          Haz click en el mapa para seleccionar una ubicación
+        </p>
+      </div>
+
+      <div class="form-actions">
+        <button
+          mat-raised-button
+          type="button"
+          (click)="resetForm()"
+          [disabled]="locationService.isLoading()"
+        >
+          Limpiar
+        </button>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="locationForm.invalid || locationService.isLoading()"
+        >
+          @if (locationService.isLoading()) {
+          <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+          <span>Guardar ubicación</span>
+          }
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,39 @@
+<div class="location-detail-container">
+  <div class="header">
+    <div class="title-section">
+      <h2>{{ location.subject }}</h2>
+      <p class="teacher">Prof. {{ location.teacher }}</p>
+    </div>
+    <button mat-icon-button (click)="close()" class="close-btn">
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </div>
+
+  <div class="content">
+    <div class="info-grid">
+      <div class="info-item">
+        <mat-icon fontIcon="class" color="primary"></mat-icon>
+        <div>
+          <label>Paralelo</label>
+          <span>{{ location.parallel }}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <mat-icon fontIcon="schedule" color="primary"></mat-icon>
+        <div>
+          <label>Horario</label>
+          <span>{{ location.schedule }}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <mat-icon fontIcon="place" color="primary"></mat-icon>
+        <div>
+          <label>Coordenadas</label>
+          <span>{{ location.latitude }}, {{ location.longitude }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
