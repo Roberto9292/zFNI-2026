@@ -32,55 +32,102 @@ Módulo I · Trabajo Final — Análisis, construcción y publicación.
 
 ## 1. El problema y a quién afecta
 
-La Ciudad Universitaria de la UTO es **grande y abierta**: varios bloques
-repartidos por un campus que se recorre a pie, sin carteles visibles desde
-fuera y con edificios que se parecen entre sí. Quien ya lleva años ahí se
-mueve de memoria. **Quien es nuevo, no.**
+### El contexto
+
+La **Ciudadela Universitaria** de la Universidad Técnica de Oruro —dirección
+postal Av. Cnel. Alejandro Dehene, entre Av. Jaime Sainz y calle C. Pinilla;
+sobre la RN12 Oruro–Toledo, Distrito 5, según OpenStreetMap— no es un edificio:
+es un **campus abierto y extenso**, con bloques repartidos entre avenidas,
+recorridos por los que se circula **a pie, en vehículo particular y en el
+transporte universitario de la propia UTO**, que enlaza facultades y
+dependencias en tres turnos diarios.
+
+Ahí conviven las **7 facultades de la UTO y sus 48 carreras**. Solo la
+Facultad Nacional de Ingeniería —fundada en 1906, una de las más antiguas del
+país— reúne **15 carreras de ingeniería**: Minas, Civil, Metalúrgica,
+Mecánica, Eléctrica, Química, Geológica, Alimentos, Sistemas, Industrial,
+Electromecánica, Electrónica, Mecatrónica, Informática y Materiales. En 2024,
+cerca de un tercio de los varones matriculados en toda la UTO cursaban en la
+FNI.
+
+Un campus de ese tamaño, con esa cantidad de gente rotando entre bloques, se
+recorre de memoria **solo si uno lleva años ahí**.
+
+### La evidencia de que el problema existe
+
+No hace falta suponerlo: **la propia FNI publica una página titulada
+"Ubicación de Aulas para Nuevos"**. Su contenido es una **imagen JPG**
+(`AULAS-FNI.jpg`) y un enlace a Google Maps.
+
+Que esa página exista confirma que la facultad reconoce el problema. Que su
+única respuesta sea una imagen muestra lo lejos que queda de resolverlo:
+
+- **No se puede buscar.** Hay que recorrer la imagen con la vista.
+- **No sabe dónde estás.** No hay ruta, ni distancia, ni orientación.
+- **No tiene horarios ni docentes.** Solo dibuja bloques.
+- **Envejece en silencio.** Si un aula cambia, la imagen sigue igual hasta que
+  alguien la rehaga.
+
+### El problema, en una frase
 
 El horario oficial dice *qué* materia se dicta, *cuándo* y en qué aula — pero
-identifica el aula con un código, `Bloque B, Aula 12`, que solo sirve si uno
-ya sabe dónde queda el bloque B. Ese dato, el de *dónde está*, nunca estuvo en
-un mapa: vive en la memoria de la gente. Así que el estudiante nuevo hace lo
-único que puede hacer: **caminar el campus preguntando**, y llegar tarde.
+identifica el aula con un código, `Bloque B, Aula 12`, que **solo sirve si uno
+ya sabe dónde queda el bloque B**. Ese dato, el de *dónde está*, nunca estuvo
+en un mapa consultable: vive en la memoria de la gente.
 
-El problema, entonces, no es que falten datos. Es que **el dato que existe
-(el aula) no está enlazado a una coordenada**. FNI Go es ese enlace: convierte
-un código de aula en un punto del mapa y en un camino hasta él.
+Así que quien es nuevo hace lo único que puede: **caminar el campus
+preguntando**, y llegar tarde. El problema no es que falten datos, es que
+**el dato que existe (el aula) no está enlazado a una coordenada**. FNI Go es
+ese enlace.
 
 ### Los dos casos de uso reales
 
 **1. "¿Dónde queda mi clase?"** — El caso obvio. Se busca la materia y la app
-responde con el punto exacto en el mapa y la ruta a pie desde donde uno esté.
+la sitúa en el mapa y traza la ruta a pie desde donde uno esté, sobre calles
+reales.
 
 **2. "¿Dónde está este docente ahora?"** — El caso que no es obvio, y que
-resultó igual de útil. Buscar a un docente en el campus es un problema
-cotidiano: hay que consultarle una nota, entregar un trabajo, pedirle una
-firma. Pero un docente no está en un solo sitio: **dicta varias materias, en
-distintos bloques y a distintas horas**.
+resultó igual de útil. Ubicar a un docente en el campus es un problema
+cotidiano: consultar una nota, entregar un trabajo, pedir una firma. Pero un
+docente no está en un solo sitio: **dicta varias materias, en distintos
+bloques y a distintas horas**.
 
 Como cada aula registrada guarda **quién la dicta, qué materia, en qué paralelo
-y en qué horario**, buscar el nombre del docente devuelve **todas sus clases a
-la vez**. Comparando con la hora actual se sabe en cuál de ellas está en este
-momento — aunque sea una materia que uno ni siquiera cursa. La aplicación no
-rastrea a nadie: cruza el horario que ya es público con el mapa, que es
-justamente lo que hoy hay que reconstruir preguntando de puerta en puerta.
+y en qué horario**, buscar su nombre devuelve **todas sus clases a la vez**.
+Comparando con la hora actual se sabe en cuál está en este momento — aunque
+sea una materia que uno ni siquiera cursa. La aplicación no rastrea a nadie:
+cruza el horario, que ya es público, con el mapa. Es exactamente lo que hoy se
+resuelve preguntando de puerta en puerta.
 
 ### A quién afecta
 
 | Quién | Por qué le afecta |
 |---|---|
-| **Estudiantes de nuevo ingreso** | Los más golpeados. Llegan con un horario que no pueden traducir a un lugar físico, y el costo se concentra en las primeras semanas, que es cuando peor sienta llegar tarde. |
-| **Estudiantes que cursan materias de otra carrera o bloque** | Conocen su propio edificio, no el resto del campus. |
-| **Cualquier estudiante que necesite ubicar a un docente** | Notas, trámites, firmas, consultas. Hoy se resuelve recorriendo bloques a ciegas o esperando en un pasillo. |
+| **Estudiantes de nuevo ingreso** | Los más golpeados. Llegan con un horario que no pueden traducir a un lugar físico, y el costo se concentra en las primeras semanas, justo cuando peor sienta llegar tarde. |
+| **Estudiantes de otras carreras y facultades** | El campus es compartido por las 7 facultades. Se cruza a otro bloque para una materia de servicio, un trámite o para encontrarse con alguien, y ahí la memoria del propio edificio ya no sirve. |
+| **Quien necesita ubicar a un docente** | Notas, trámites, firmas, consultas. Hoy se resuelve recorriendo bloques a ciegas o esperando en un pasillo. |
+| **Estudiantes de último año de colegio** | Llegan al campus en visitas, talleres y jornadas de orientación vocacional, para conocer las carreras antes de elegir una. Es su primer contacto: no conocen ni un bloque, y son quienes más necesitan que el campus se explique solo. La UTO presenta sus 48 carreras a bachilleres en su Feria Profesiográfica anual. |
 | **Docentes suplentes e invitados** | Reciben una asignación de aula sin ninguna referencia geográfica. |
 | **Visitantes** | Defensas de tesis, congresos, exámenes de admisión: van una sola vez, a un lugar que nunca vieron. |
 
 ### Cómo condicionó el diseño
 
-El uso real ocurre **caminando, al aire libre, con una mano ocupada y con
-prisa**. De ahí tres decisiones: la aplicación se diseñó para móvil primero,
-la pantalla principal es el mapa y no un menú, y la búsqueda ignora acentos y
-mayúsculas, porque nadie escribe `Cálculo` con tilde yendo tarde a clase.
+Al campus se **llega** en auto, en minibús o en el transporte universitario;
+pero una vez dentro, **entre bloques se camina**. Por eso la ruta que traza la
+aplicación es peatonal: el tramo problemático no es llegar a la Ciudadela, es
+encontrar el aula una vez que ya se está en ella.
+
+Y ese tramo se recorre **al aire libre, con una mano ocupada y con prisa**. De
+ahí tres decisiones: la aplicación se diseñó para móvil primero, la pantalla
+principal es el mapa y no un menú, y la búsqueda ignora acentos y mayúsculas,
+porque nadie escribe `Cálculo` con tilde yendo tarde a clase.
+
+> **Fuentes consultadas:** [FNI — Ubicación de Aulas para Nuevos](https://www.fni.uto.edu.bo/index.php/publicaciones/ubicacion-de-aulas-nuevos) ·
+> [UTO — Transporte universitario](https://www.uto.edu.bo/transporte-uto/) ·
+> [UTO — Facultad Nacional de Ingeniería](https://www.uto.edu.bo/facultad-nacional-de-ingenieria/) ·
+> [UTO — Estadísticas Universitarias 2024](https://www.uto.edu.bo/wp-content/uploads/2025/10/Estadisticas-Universitarias-2024.pdf) ·
+> [La Patria — Feria Profesiográfica de la UTO](https://lapatria.bo/opinion/columnas/feria-profesiografica-uto-carreras-descubrir/) ·
+> [Wikipedia — Facultad Nacional de Ingeniería](https://es.wikipedia.org/wiki/Facultad_Nacional_de_Ingenier%C3%ADa)
 
 ---
 
@@ -96,7 +143,7 @@ mayúsculas, porque nadie escribe `Cálculo` con tilde yendo tarde a clase.
 | **Búsqueda de un aula** | Por materia, carrera, bloque o paralelo. Insensible a mayúsculas y acentos: `calculo` encuentra `Cálculo`. Resultados paginados de 5 en 5 y marcados en el mapa. |
 | **Búsqueda de un docente** | Escribir el nombre devuelve **todas las clases que dicta**, cada una con su materia, paralelo, horario y ubicación en el mapa. Es lo que permite ubicarlo aunque la materia en la que está ahora no sea la que uno cursa. |
 | **Detalle** | Panel inferior con todos los datos del aula: materia, docente, carrera, bloque, paralelo y horario, más el acceso a la ruta. |
-| **Ruta a pie** | Trazado por calles reales con seguimiento del GPS en vivo, distancia, tiempo estimado y recálculo automático al alejarse más de 25 m del punto donde se calculó. |
+| **Ruta a pie** | Trazado por calles reales con seguimiento del GPS en vivo, distancia, tiempo estimado y recálculo automático al alejarse más de 25 m del punto donde se calculó. Es el tramo que importa: al campus se llega en vehículo, pero entre bloques se camina. |
 | **Entrega a Google Maps** | Botón para abrir la navegación paso a paso en la app de Google Maps. |
 | **Tiempo real** | Un aula registrada desde un dispositivo aparece en los demás sin recargar (listener de Firestore). |
 | **Accesibilidad** | Mapa navegable con teclado (flechas y `+`/`-`), etiquetas ARIA, foco gestionado en diálogos. |
@@ -110,6 +157,12 @@ Se dejó fuera de forma deliberada, no por olvido:
   clases con su horario y el usuario compara con la hora; no cruza el horario
   con el reloj para señalar una sola. Es el siguiente paso natural, y es
   pequeño.
+- **Rutas en vehículo y cómo llegar al campus desde la ciudad.** La ruta que
+  se traza es **peatonal**, entre el punto donde está el usuario y el aula.
+  Para llegar en auto o en transporte público hasta la Ciudadela, el botón de
+  Google Maps hace ese trabajo mejor. Añadir perfil vehicular sería cambiar
+  `foot` por `driving` en la llamada a OSRM, pero no resuelve el problema que
+  motivó la aplicación: dentro del campus se camina.
 - **Editar y borrar aulas desde la interfaz.** Las operaciones existen en
   `LocationService` pero no se expusieron: sin roles de usuario, cualquiera
   podría borrar el trabajo de otro. La UI llega cuando existan los permisos.
