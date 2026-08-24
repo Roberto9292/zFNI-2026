@@ -46,5 +46,12 @@ export function filtrarUbicaciones(
     return [...ubicaciones];
   }
 
-  return ubicaciones.filter((u) => normalizar(textoBuscable(u)).includes(buscado));
+  // Separamos la búsqueda en palabras individuales
+  const palabras = buscado.split(/\s+/);
+
+  // Un aula coincide si TODAS las palabras de búsqueda existen en sus datos, sin importar el orden
+  return ubicaciones.filter((u) => {
+    const textoAula = normalizar(textoBuscable(u));
+    return palabras.every((palabra) => textoAula.includes(palabra));
+  });
 }
