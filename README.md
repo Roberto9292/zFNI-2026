@@ -9,7 +9,21 @@ calles reales.
 |---|---|
 | **Aplicación publicada** | **https://fni-2026.web.app** |
 | **Repositorio** | https://github.com/Roberto9292/zFNI-2026 |
+| **Video explicativo** | _(pendiente — se añade el enlace aquí)_ |
 | **Autor** | Roberto Pablo Ugarte Gutierrez |
+
+## Capturas
+
+> _Pendientes: se toman junto con el video. Basta guardar los cuatro PNG en
+> `docs/capturas/` con los nombres que ya esperan los enlaces de abajo._
+
+| Acceso | Mapa del campus |
+|---|---|
+| ![Pantalla de acceso](docs/capturas/01-login.png) | ![Mapa con las aulas](docs/capturas/02-mapa.png) |
+
+| Registro de un aula | Ruta a pie en curso |
+|---|---|
+| ![Formulario de registro](docs/capturas/03-registro.png) | ![Ruta trazada hasta el aula](docs/capturas/04-ruta.png) |
 
 ---
 
@@ -366,6 +380,64 @@ Maps en Google Cloud Console. Ver la sección de estado más abajo.
 Para apuntar a otro proyecto de Firebase: cambiar el bloque `initializeApp` de
 `src/app/app.config.ts`, la clave del `<script>` de `src/index.html` y el
 `default` de `.firebaserc`.
+
+### Estructura del proyecto
+
+La organización sigue una regla: **`core/` no sabe que existe `components/`.**
+La lógica no depende de la interfaz, así que se puede probar y reutilizar sin
+montar Angular.
+
+```
+src/
+├─ index.html                      # carga el SDK de Google Maps y las fuentes
+├─ main.ts                         # arranque de la aplicación
+├─ styles.scss                     # estilos globales
+├─ styles/
+│  └─ _theme-colors.scss           # paleta del tema Material (Material 3)
+└─ app/
+   ├─ app.component.ts|html        # shell: decide entre login y dashboard
+   ├─ app.config.ts                # providers: Firebase, router, HttpClient
+   ├─ app.routes.ts                # rutas con carga diferida
+   │
+   ├─ core/                        # lógica, sin interfaz — no importa nada de components/
+   │  ├─ models/
+   │  │  ├─ location.interface.ts  # el aula: materia, docente, coordenadas…
+   │  │  └─ user.interface.ts      # usuario ya normalizado
+   │  ├─ services/
+   │  │  ├─ auth.service.ts        # sesión (Firebase Auth) como signal
+   │  │  ├─ location.service.ts    # CRUD + listener en vivo de Firestore
+   │  │  ├─ navegacion.service.ts  # seguimiento GPS y recálculo de ruta
+   │  │  └─ ruta.service.ts        # cliente de OSRM
+   │  ├─ busqueda/
+   │  │  └─ filtrar-ubicaciones.ts # función pura: filtra sin acentos ni mayúsculas
+   │  ├─ maps/
+   │  │  └─ mapa.ts                # opciones y pines, en un solo sitio
+   │  └─ constants/
+   │     └─ fni.ts                 # centro y zoom del campus
+   │
+   ├─ components/                  # una carpeta por pantalla o panel
+   │  ├─ login/                    # acceso y registro
+   │  ├─ dashboard/                # barra, mapa y botón de registro
+   │  ├─ map-view/                 # mapa, búsqueda y marcadores
+   │  ├─ location-form/            # alta de aula (se abre en diálogo)
+   │  ├─ location-detail/          # ficha del aula (panel inferior)
+   │  └─ panel-ruta/               # distancia, tiempo y acciones de la ruta
+   │
+   └─ shared/
+      └─ directives/
+         └─ mapa-teclado.directive.ts  # mover y acercar el mapa con el teclado
+```
+
+**Configuración en la raíz**
+
+| Archivo | Para qué |
+|---|---|
+| `firebase.json` | Hosting (`public: dist/browser`), rewrite de SPA y caché |
+| `.firebaserc` | Proyecto de Firebase por defecto (`fni-2026`) |
+| `firestore.rules` | Reglas de seguridad — la única validación no eludible |
+| `firestore.indexes.json` | Índices compuestos de Firestore |
+| `angular.json` | Configuración de compilación |
+| `PENDIENTES.md` | Backlog priorizado por riesgo |
 
 ---
 
