@@ -20,6 +20,10 @@ export class AuthService {
 
   currentUser = signal<User | null>(null);
 
+  /** false hasta que Firebase resuelve la sesion persistida. Sin esto,
+   *  el arranque parece "sin usuario" y dispara un redirect a /login. */
+  isReady = signal(false);
+
   isLoading = signal(false);
 
   constructor() {
@@ -32,6 +36,7 @@ export class AuthService {
       } else {
         this.currentUser.set(null);
       }
+      this.isReady.set(true);
     });
   }
 

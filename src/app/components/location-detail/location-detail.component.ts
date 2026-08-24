@@ -1,10 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
-  inject,
   Inject,
-  signal,
+  inject,
 } from '@angular/core';
 import {
   MAT_BOTTOM_SHEET_DATA,
@@ -24,16 +22,27 @@ import { Location } from '../../core/models/location.interface';
 export class LocationDetailComponent {
   private bottomSheetRef = inject(MatBottomSheetRef<LocationDetailComponent>);
 
-  isDeleting = signal(false);
-  deleteButtonIcon = computed(() =>
-    this.isDeleting() ? 'hourglass_empty' : 'delete'
-  );
-  deleteButtonText = computed(() =>
-    this.isDeleting() ? 'Eliminando...' : 'Eliminar'
-  );
   constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public location: Location) {}
 
   close(): void {
     this.bottomSheetRef.dismiss();
+  }
+
+  /**
+   * Cierra devolviendo 'ruta': el mapa lo interpreta como la orden de trazar
+   * el camino hasta esta ubicacion.
+   */
+  comoLlegar(): void {
+    this.bottomSheetRef.dismiss('ruta');
+  }
+
+  /** Navegacion paso a paso real, delegada a Google Maps. */
+  abrirEnGoogleMaps(): void {
+    const destino = `${this.location.latitude},${this.location.longitude}`;
+    window.open(
+      `https://www.google.com/maps/dir/?api=1&destination=${destino}&travelmode=walking`,
+      '_blank',
+      'noopener'
+    );
   }
 }

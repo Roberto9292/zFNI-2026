@@ -1,14 +1,21 @@
 <div class="login-container">
   <mat-card class="login-card">
     <mat-card-header>
+      <img
+        class="escudo"
+        src="escudo-fni.png"
+        alt="Escudo de la Facultad Nacional de Ingeniería"
+        width="83"
+        height="99"
+      />
+      <p class="marca-login">FNI&nbsp;<strong>Go</strong></p>
       <mat-card-title>
-        <mat-icon fontIcon="location_on"></mat-icon>
-        {{ isLoginMode() ? "Iniciar Sesión" : "Crear Cuenta" }}
+        {{ isLoginMode() ? "Iniciar sesión" : "Crear cuenta" }}
       </mat-card-title>
       <mat-card-subtitle>
         {{
           isLoginMode()
-            ? "Accede a tu cuenta para continuar"
+            ? "Accede para ver las aulas del campus"
             : "Crea una nueva cuenta"
         }}
       </mat-card-subtitle>
@@ -207,4 +214,11 @@
       </div>
     </mat-card-content>
   </mat-card>
+
+  <footer class="pie-login">
+    <small>
+      © {{ anio }} Roberto Pablo Ugarte Gutierrez · Todos los derechos
+      reservados
+    </small>
+  </footer>
 </div>

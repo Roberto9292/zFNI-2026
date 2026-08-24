@@ -1,107 +1,136 @@
+// Sin gradientes decorativos: el fondo usa los tonos del tema institucional,
+// y el protagonismo lo tiene el escudo. Todos los colores son tokens.
+
 .login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 20px;
+  min-height: 100dvh;
+  padding: 24px;
+  background: var(--mat-sys-surface-container-low);
 }
 
 .login-card {
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border-radius: 16px;
-  overflow: hidden;
+  max-width: 420px;
+  padding: 32px 28px;
+  border-radius: 20px;
+  background: var(--mat-sys-surface);
+  box-shadow: var(--mat-sys-level2);
 }
 
 .login-card mat-card-header {
-  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-  color: white;
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 0 24px;
   text-align: center;
 }
 
+.escudo {
+  height: 68px;
+  width: auto;
+}
+
+.marca-login {
+  margin: 10px 0 18px;
+  font: var(--mat-sys-headline-medium);
+  font-weight: 400;
+  color: var(--mat-sys-on-surface);
+  letter-spacing: 0.01em;
+}
+
+.marca-login strong {
+  font-weight: 700;
+  color: var(--mat-sys-primary);
+}
+
 .login-card mat-card-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  font: var(--mat-sys-headline-small);
+  color: var(--mat-sys-on-surface);
+}
+
+.login-card mat-card-subtitle {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .login-card mat-card-content {
-  padding: 32px 24px 24px 24px;
+  padding: 0;
 }
 
 .full-width {
   width: 100%;
-  margin-bottom: 16px;
 }
 
-.form-actions {
-  margin: 24px 0 16px 0;
+.full-width.mat-mdc-form-field {
+  margin-bottom: 4px;
+}
+
+button.full-width {
+  margin-top: 8px;
+  height: 48px;
 }
 
 .divider {
-  text-align: center;
-  margin: 24px 0;
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 16px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
 }
 
-.divider::before {
+.divider::before,
+.divider::after {
   content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
+  flex: 1;
   height: 1px;
-  background-color: #e0e0e0;
-}
-
-.divider span {
-  background-color: white;
-  padding: 0 16px;
-  color: #666;
-  font-size: 14px;
+  background: var(--mat-sys-outline-variant);
 }
 
 .google-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background-color: white;
-  border: 1px solid #dadce0;
-  color: #3c4043;
-  margin-bottom: 24px;
+  border: 1px solid var(--mat-sys-outline);
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface);
 }
 
 .google-btn:hover {
-  background-color: #f8f9fa;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--mat-sys-surface-container-high);
 }
 
 .toggle-mode {
+  margin-top: 20px;
   text-align: center;
-  margin-top: 16px;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
 }
 
-.toggle-mode p {
-  margin: 0;
-  color: #666;
-  font-size: 14px;
+.error-message {
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
 }
 
 @media (max-width: 480px) {
   .login-container {
-    padding: 10px;
+    padding: 16px;
+    place-items: stretch;
   }
 
-  .login-card mat-card-content {
-    padding: 24px 16px 16px 16px;
+  .login-card {
+    max-width: none;
+    box-shadow: none;
+    background: var(--mat-sys-surface);
   }
 }
 
-mat-card-subtitle {
-  color: #e0e0e0;
+
+.pie-login {
+  padding: 8px 0 4px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+  text-align: center;
+  max-width: 420px;
 }

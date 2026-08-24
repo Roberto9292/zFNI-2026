@@ -5,30 +5,13 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { LocationFormComponent } from './components/location-form/location-form.component';
-import { MapViewComponent } from './components/map-view/map-view.component';
+import DashboardComponent from './components/dashboard/dashboard.component';
 import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [
-    MatTabsModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    LocationFormComponent,
-    MapViewComponent,
-    RouterOutlet,
-  ],
+  imports: [DashboardComponent, RouterOutlet],
   templateUrl: 'app.component.html',
-  styleUrls: ['./app.component.scss'],
-  providers: [AuthService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
@@ -37,14 +20,21 @@ export class AppComponent {
 
   constructor() {
     effect(() => {
+      // Esperamos a que Firebase resuelva la sesion: antes de eso "sin usuario"
+      // es un falso negativo y nos mandaba a /login aunque hubiera sesion.
+      if (!this.authService.isReady()) {
+        return;
+      }
+
       const user = this.authService.currentUser();
-      if (!user) {
+      const onLogin = this.router.url.startsWith('/login');
+
+      if (!user && !onLogin) {
         this.router.navigate(['/login']);
+      } else if (user && onLogin) {
+        // Sin esto la URL se quedaba en /login mientras se veia el dashboard.
+        this.router.navigate(['/dashboard']);
       }
     });
-  }
-
-  async onSignOut(): Promise<void> {
-    await this.authService.signOut();
   }
 }

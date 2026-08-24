@@ -1,0 +1,70 @@
+@if (authService.currentUser(); as user) {
+<mat-toolbar class="barra">
+  <div class="marca">
+    <img
+      class="marca__escudo"
+      src="escudo-fni.png"
+      alt="Escudo de la Facultad Nacional de Ingeniería"
+      width="83"
+      height="99"
+    />
+    <span class="marca__nombre">FNI&nbsp;<strong>Go</strong></span>
+  </div>
+
+  <div class="usuario">
+    <span class="usuario__nombre">{{ user.displayName || user.email }}</span>
+
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="menuUsuario"
+      aria-label="Menú de la cuenta"
+    >
+      @if (user.photoURL) {
+      <img
+        class="usuario__avatar"
+        [src]="user.photoURL"
+        [alt]="user.displayName || user.email"
+        width="32"
+        height="32"
+      />
+      } @else {
+      <mat-icon fontIcon="account_circle"></mat-icon>
+      }
+    </button>
+
+    <mat-menu #menuUsuario="matMenu">
+      <div class="menu__correo">{{ user.email }}</div>
+      <button mat-menu-item (click)="onSignOut()">
+        <mat-icon fontIcon="logout"></mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>
+
+<main class="contenido">
+  <app-map-view (rutaActiva)="rutaActiva.set($event)" />
+
+  @if (!rutaActiva()) {
+  <button
+    mat-fab
+    class="registrar"
+    type="button"
+    [extended]="!esMovil()"
+    [attr.aria-label]="esMovil() ? 'Registrar ubicación' : null"
+    [matTooltip]="esMovil() ? 'Registrar ubicación' : ''"
+    (click)="abrirRegistro()"
+  >
+    <mat-icon fontIcon="add_location_alt"></mat-icon>
+    @if (!esMovil()) { Registrar ubicación }
+  </button>
+  }
+</main>
+
+<footer class="pie">
+  <small>
+    © {{ anio }} Roberto Pablo Ugarte Gutierrez<span class="pie__extra">
+      · Todos los derechos reservados</span>
+  </small>
+</footer>
+}

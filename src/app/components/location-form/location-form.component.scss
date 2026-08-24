@@ -1,68 +1,211 @@
-.form-container {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-}
+// Todos los colores salen de los tokens del tema institucional. Nada
+// codificado a mano: cambiar la identidad no deberia obligar a tocar esto.
 
-.form-row {
+.formulario {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  flex-direction: column;
+  gap: 28px;
 }
 
-.form-field {
-  flex: 1;
-}
-
-.map-section {
-  margin: 24px 0;
-}
-
-.map-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.map-header h3 {
+.grupo {
+  border: none;
   margin: 0;
-  color: #333;
+  padding: 0;
+  min-width: 0; // sin esto un fieldset no encoge dentro de un grid
 }
 
-.map-instruction {
+.grupo__titulo {
+  padding: 0 0 4px;
+  font: var(--mat-sys-title-medium);
+  color: var(--mat-sys-on-surface);
+}
+
+.grupo__ayuda {
+  margin: 0 0 12px;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Rejilla de 12 columnas: con 6 no habia termino medio entre dejar Paralelo
+// demasiado ancho (264px para una letra) o demasiado estrecho (95px, donde su
+// propia etiqueta no cabia). Con 12 el reparto es 3 + 9.
+.grupo__campos {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 4px 16px;
+  margin-top: 12px;
+}
+
+.grupo__campos > mat-form-field {
+  grid-column: span 6;
+}
+
+// Reparto de la rejilla de 12. Se declara por clase y no por posicion: al
+// mover Docente detras de Paralelo los indices cambiaron otra vez, y con
+// :nth-of-type habria que reajustar la hoja de estilos en cada reordenacion.
+//
+//   Materia  | Carrera        (6 + 6)
+//   Bloque   | Paralelo       (6 + 6)
+//   Docente  | Inicio · Fin   (3 + 9)
+.grupo__campos > .campo--estrecho {
+  grid-column: span 6;
+}
+
+.grupo__campos > .campo--docente {
+  grid-column: span 3;
+}
+
+// El mapa manda dentro de su grupo: ocupa todo el ancho y el boton flota
+// encima en vez de robarle una fila al formulario.
+.mapa {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.mapa:focus-visible {
+  outline: 3px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+.mapa__accion {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  box-shadow: var(--mat-sys-level2);
+}
+
+.coordenadas {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
-  font-size: 14px;
-  color: #666;
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--mat-sys-surface-container-high);
+  font: var(--mat-sys-body-medium);
 }
 
-.form-actions {
+.coordenadas__icono {
+  color: var(--mat-sys-primary);
+  flex: none;
+}
+
+.coordenadas__valor {
+  font-variant-numeric: tabular-nums;
+  color: var(--mat-sys-on-surface);
+}
+
+.coordenadas__vacio {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.acciones {
   display: flex;
   justify-content: flex-end;
-  gap: 16px;
-  margin-top: 24px;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
 }
 
-@media (max-width: 768px) {
-  .form-row {
-    flex-direction: column;
+// Botones de mas peso: son el cierre de un formulario largo y el destino del
+// recorrido, no un detalle al pie.
+.acciones button {
+  height: 48px;
+  padding-inline: 28px;
+  border-radius: 24px;
+  font: var(--mat-sys-label-large);
+}
+
+.mapa__accion {
+  height: 40px;
+  padding-inline: 18px;
+  border-radius: 20px;
+}
+
+
+
+// --- Marco cuando vive dentro de un dialogo ---------------------------------
+
+.formulario {
+  max-height: inherit;
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 20px 0;
+}
+
+.cabecera__titulo {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+  color: var(--mat-sys-on-surface);
+}
+
+.cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 20px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.acciones {
+  padding: 12px 20px 20px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface);
+}
+
+// Las dos horas se quedan nueve de las doce columnas: sus etiquetas son las
+// mas largas del formulario y con ocho quedaban a 3px de recortarse.
+.horario {
+  grid-column: span 9;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
+.horario mat-form-field {
+  min-width: 0;
+}
+
+// --- Adaptacion a pantallas pequenas ---------------------------------------
+// Va al final a proposito: con la misma especificidad gana la ultima regla,
+// y tenerla antes de las reglas base hacia que se anulara sola.
+@media (max-width: 700px) {
+  .grupo__campos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .grupo__campos > mat-form-field,
+  .grupo__campos > .campo--estrecho,
+  .grupo__campos > .campo--docente,
+  .horario {
+    grid-column: span 1;
+  }
+
+  // .horario tiene rejilla propia: sin anularla las dos horas seguian lado a
+  // lado a 134px, donde "Hora de finalización" no cabe ni de lejos.
+  .horario {
+    grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
 
-  .map-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+  .acciones {
+    flex-direction: column-reverse;
   }
 
-  .form-actions {
-    flex-direction: column;
+  .acciones button {
+    width: 100%;
+    height: 52px;
   }
-}
-
-mat-card-content {
-  margin-top: 1rem;
 }

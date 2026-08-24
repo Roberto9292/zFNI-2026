@@ -1,54 +1,5 @@
-@if (authService.currentUser(); as user) {
-<mat-toolbar color="primary">
-  <div class="toolbar-content">
-    <div class="brand">
-      <mat-icon fontIcon="location_on"></mat-icon>
-      <span>FNI Go</span>
-    </div>
-
-    <div class="user-section">
-      <div class="user-info">
-        @if (user.photoURL) {
-        <img
-          [src]="user.photoURL"
-          [alt]="user.displayName || user.email"
-          class="user-avatar"
-        />
-        } @else {
-        <mat-icon fontIcon="account_circle" class="default-avatar"></mat-icon>
-        }
-        <span class="user-name">{{ user.displayName || user.email }}</span>
-      </div>
-
-      <button mat-icon-button [matMenuTriggerFor]="userMenu">
-        <mat-icon fontIcon="more_vert"></mat-icon>
-      </button>
-
-      <mat-menu #userMenu="matMenu">
-        <button mat-menu-item (click)="onSignOut()">
-          <mat-icon fontIcon="logout"></mat-icon>
-          <span>Cerrar Sesión</span>
-        </button>
-      </mat-menu>
-    </div>
-  </div>
-</mat-toolbar>
-
-<div class="dashboard-container">
-  <mat-tab-group animationDuration="300ms">
-    <mat-tab label="Registrar ubicación">
-      <div class="tab-content">
-        <app-location-form />
-      </div>
-    </mat-tab>
-
-    <mat-tab label="Ver mapa">
-      <div class="tab-content">
-        <app-map-view />
-      </div>
-    </mat-tab>
-  </mat-tab-group>
-</div>
-}@else {
+@if (authService.isReady()) { @if (authService.currentUser()) {
+<app-dashboard />
+} @else {
 <router-outlet />
-}
+} }

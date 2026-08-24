@@ -4,12 +4,11 @@ export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   {
     path: 'login',
-    loadComponent: async () =>
-      await import('./components/login/login.component'),
+    loadComponent: () => import('./components/login/login.component'),
   },
   {
     path: 'dashboard',
-    loadComponent: () => import('./app.component').then((m) => m.AppComponent),
+    loadComponent: () => import('./components/dashboard/dashboard.component'),
   },
   { path: '**', redirectTo: '/dashboard' },
 ];

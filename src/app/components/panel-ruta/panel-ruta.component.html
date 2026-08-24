@@ -1,0 +1,67 @@
+@if (nav.destino(); as destino) {
+<aside class="panel-ruta" role="complementary" aria-label="Ruta activa">
+  <header class="panel-ruta__cabecera">
+    <mat-icon fontIcon="directions_walk" class="panel-ruta__icono"></mat-icon>
+    <div class="panel-ruta__titulo">
+      <strong>{{ destino.subject }}</strong>
+      <small>{{ destino.teacher }} · Paralelo {{ destino.parallel }}</small>
+    </div>
+
+    <button
+      mat-icon-button
+      type="button"
+      class="panel-ruta__cerrar"
+      aria-label="Terminar ruta"
+      (click)="nav.detener()"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </header>
+
+  @if (nav.metros() !== null) {
+  <div class="panel-ruta__cifras">
+    <div class="cifra">
+      <span class="cifra__valor">{{ nav.distanciaTexto() }}</span>
+      <span class="cifra__etiqueta">distancia</span>
+    </div>
+
+    @if (nav.minutos(); as min) {
+    <div class="cifra">
+      <span class="cifra__valor">{{ min }} min</span>
+      <span class="cifra__etiqueta">a pie</span>
+    </div>
+    }
+  </div>
+
+  <p class="panel-ruta__nota">
+    @if (nav.aproximada()) {
+    <mat-icon fontIcon="warning" class="panel-ruta__aviso"></mat-icon>
+    Línea recta: no se pudo calcular la ruta por calles.
+    } @else {
+    <mat-icon fontIcon="route"></mat-icon>
+    Ruta por calles
+    }
+    @if (nav.precision(); as p) {
+    <span class="panel-ruta__gps">· GPS ±{{ p }} m</span>
+    }
+  </p>
+  } @else {
+  <p class="panel-ruta__nota">
+    <mat-icon fontIcon="hourglass_empty"></mat-icon>
+    Calculando ruta…
+  </p>
+  }
+
+  <footer class="panel-ruta__acciones">
+    <button mat-stroked-button type="button" (click)="encuadrar.emit()">
+      <mat-icon fontIcon="zoom_out_map"></mat-icon>
+      Ver ruta
+    </button>
+
+    <button mat-flat-button type="button" (click)="abrirNavegacion()">
+      <mat-icon fontIcon="navigation"></mat-icon>
+      Navegar
+    </button>
+  </footer>
+</aside>
+}

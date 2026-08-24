@@ -34,9 +34,9 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [AuthService],
 })
 export default class LoginComponent {
+  readonly anio = new Date().getFullYear();
   private fb = inject(FormBuilder);
   public authService = inject(AuthService);
   private router = inject(Router);

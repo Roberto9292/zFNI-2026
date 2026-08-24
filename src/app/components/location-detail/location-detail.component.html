@@ -2,7 +2,6 @@
   <div class="header">
     <div class="title-section">
       <h2>{{ location.subject }}</h2>
-      <p class="teacher">Prof. {{ location.teacher }}</p>
     </div>
     <button mat-icon-button (click)="close()" class="close-btn">
       <mat-icon fontIcon="close"></mat-icon>
@@ -11,6 +10,30 @@
 
   <div class="content">
     <div class="info-grid">
+      <div class="info-item">
+        <mat-icon fontIcon="person" color="primary"></mat-icon>
+        <div>
+          <label>Docente</label>
+          <span>{{ location.teacher }}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <mat-icon fontIcon="school" color="primary"></mat-icon>
+        <div>
+          <label>Carrera</label>
+          <span>{{ location.career || "—" }}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <mat-icon fontIcon="apartment" color="primary"></mat-icon>
+        <div>
+          <label>Bloque</label>
+          <span>{{ location.block || "—" }}</span>
+        </div>
+      </div>
+
       <div class="info-item">
         <mat-icon fontIcon="class" color="primary"></mat-icon>
         <div>
@@ -34,6 +57,18 @@
           <span>{{ location.latitude }}, {{ location.longitude }}</span>
         </div>
       </div>
+    </div>
+
+    <div class="acciones">
+      <button mat-flat-button type="button" (click)="comoLlegar()">
+        <mat-icon fontIcon="directions"></mat-icon>
+        Cómo llegar
+      </button>
+
+      <button mat-stroked-button type="button" (click)="abrirEnGoogleMaps()">
+        <mat-icon fontIcon="open_in_new"></mat-icon>
+        Abrir en Google Maps
+      </button>
     </div>
   </div>
 </div>

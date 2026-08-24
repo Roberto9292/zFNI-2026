@@ -8,8 +8,8 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 24px 24px 16px 24px;
-  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-  color: white;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
   position: relative;
   margin-top: 0.5rem;
   border-radius: 20px;
@@ -21,14 +21,9 @@
   font-weight: 500;
 }
 
-.teacher {
-  margin: 0;
-  opacity: 0.9;
-  font-size: 0.95em;
-}
 
 .close-btn {
-  color: white;
+  color: var(--mat-sys-on-primary);
   position: absolute;
   top: 16px;
   right: 16px;
@@ -49,7 +44,7 @@
   align-items: flex-start;
   gap: 16px;
   padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
 }
 
 .info-item:last-child {
@@ -70,7 +65,7 @@
 .info-item label {
   display: block;
   font-size: 0.85em;
-  color: #666;
+  color: var(--mat-sys-on-surface-variant);
   margin-bottom: 4px;
   font-weight: 500;
   text-transform: uppercase;
@@ -80,7 +75,7 @@
 .info-item span {
   display: block;
   font-size: 1em;
-  color: #333;
+  color: var(--mat-sys-on-surface);
   font-weight: 400;
 }
 
@@ -110,5 +105,31 @@
 
   .content {
     padding: 20px;
+  }
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+// Mismo peso que los botones del formulario: son la accion principal de la
+// ficha, no un pie de pagina.
+.acciones button {
+  height: 48px;
+  padding-inline: 24px;
+  border-radius: 24px;
+  font: var(--mat-sys-label-large);
+}
+
+@media (max-width: 520px) {
+  .acciones button {
+    flex: 1 1 100%;
+    height: 52px;
   }
 }

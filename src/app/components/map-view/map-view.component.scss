@@ -1,103 +1,170 @@
-.map-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.map-card {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.map-card mat-card-header {
-  background-color: #f5f5f5;
-  padding: 16px;
-  border-radius: 4px 4px 0 0;
-}
-
-.map-card mat-card-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.map-wrapper {
+// El mapa es la pantalla, no una tarjeta dentro de una pantalla.
+:host {
   position: relative;
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--mat-sys-surface-container);
 }
 
-.no-data {
+.lienzo {
   position: absolute;
+  inset: 0;
+}
+
+.lienzo:focus-visible {
+  outline: 3px solid var(--mat-sys-primary);
+  outline-offset: -3px;
+}
+
+// --- Buscador ---------------------------------------------------------------
+
+.buscador {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  display: block;
+  width: min(400px, calc(100% - 32px));
+}
+
+// Ojo: la superficie NO va en el host de mat-form-field. Ponerla ahi tapaba
+// el contorno y descuadraba la muesca de la etiqueta flotante al enfocar.
+// El fondo real se aplica en styles.scss sobre .mat-mdc-text-field-wrapper.
+.buscador__campo {
+  width: 100%;
+}
+
+.buscador__lupa {
+  color: var(--mat-sys-on-surface-variant);
+  margin-inline-end: 4px;
+}
+
+// La opcion es de dos lineas: el alto fijo de mat-option no alcanza.
+.opcion {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-block: 6px;
+  line-height: 1.35;
+}
+
+.opcion__materia {
+  font: var(--mat-sys-body-large);
+  color: var(--mat-sys-on-surface);
+}
+
+.opcion__detalle {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// --- Acciones flotantes -----------------------------------------------------
+
+.acciones-mapa {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.accion {
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+// --- Estado vacio -----------------------------------------------------------
+
+.sin-datos {
+  position: absolute;
+  z-index: 2;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  max-width: 320px;
+  padding: 28px 24px;
+  border-radius: 16px;
   text-align: center;
-  color: #666;
-  z-index: 1000;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--mat-sys-surface);
+  box-shadow: var(--mat-sys-level3);
 }
 
-.no-data mat-icon {
-  font-size: 48px;
-  height: 48px;
-  width: 48px;
-  color: #ccc;
-  margin-bottom: 16px;
+.sin-datos mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: var(--mat-sys-on-surface-variant);
 }
 
-.map-legend {
-  margin-top: 16px;
-  padding: 16px;
-  background-color: #f9f9f9;
-  border-radius: 4px;
+.sin-datos__titulo {
+  margin: 12px 0 4px;
+  font: var(--mat-sys-title-small);
+  color: var(--mat-sys-on-surface);
 }
 
-.map-legend h4 {
-  margin: 0 0 12px 0;
-  color: #333;
+.sin-datos__ayuda {
+  margin: 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
 }
 
-.legend-item {
+@media (max-width: 640px) {
+  .buscador {
+    top: 12px;
+    left: 12px;
+    width: calc(100% - 24px);
+  }
+
+  // Abajo a la izquierda, frente al boton de registrar. El ancho lo marca el
+  // propio boton, no el contenedor, para no bloquear toques sobre el mapa.
+  .acciones-mapa {
+    left: 16px;
+    right: auto;
+    bottom: 24px;
+  }
+
+}
+
+// Tablet: el buscador no necesita ocupar todo el ancho, pero 400px se queda
+// corto para leer los resultados comodamente.
+@media (min-width: 641px) and (max-width: 1024px) {
+  .buscador {
+    width: min(460px, calc(100% - 32px));
+  }
+}
+
+// Fila de carga al pie del panel de resultados.
+// Ojo: NO puede ser sticky. Pegada al borde inferior estaria siempre visible
+// y el centinela dispararia sin parar, cargando la lista entera de golpe.
+// Tiene que vivir al final del contenido desplazable.
+.cargar-mas {
+  background: var(--mat-sys-surface-container);
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+.cargar-mas__boton {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-label-large);
 }
 
-.legend-item mat-icon {
-  font-size: 20px;
-  height: 20px;
-  width: 20px;
+.cargar-mas__boton:hover,
+.cargar-mas__boton:focus-visible {
+  background: var(--mat-sys-surface-container-high);
 }
 
-@media (max-width: 768px) {
-  .map-container {
-    padding: 10px;
-  }
-
-  google-map {
-    height: 400px !important;
-  }
-}
-
-.map-controls {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 16px;
-}
-
-.location-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-@media (max-width: 768px) {
-  .map-controls {
-    justify-content: center;
-  }
+.cargar-mas__cuenta {
+  margin-inline-start: auto;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
 }

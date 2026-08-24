@@ -1,0 +1,146 @@
+// La pantalla es el mapa: la barra ocupa lo minimo y el resto es lienzo.
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh; // dvh y no vh: evita el salto por la barra del navegador movil
+}
+
+.barra {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-inline: 12px;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.marca {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+// El escudo oficial, recortado sin el rotulo: asi el nombre de la app lo
+// pone la tipografia y no compite con el texto del emblema. Se escala por
+// altura para no deformarlo nunca.
+.marca__escudo {
+  height: 34px;
+  width: auto;
+  display: block;
+  align-self: center;
+}
+
+.marca__nombre {
+  font: var(--mat-sys-title-large);
+  font-weight: 400;
+  color: var(--mat-sys-on-surface);
+  letter-spacing: 0.01em;
+  align-self: center;
+  white-space: nowrap;
+}
+
+.marca__nombre strong {
+  font-weight: 700;
+  color: var(--mat-sys-primary);
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.usuario__nombre {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usuario__avatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.menu__correo {
+  padding: 8px 16px 12px;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.contenido {
+  position: relative;
+  flex: 1;
+  min-height: 0; // sin esto el mapa desborda en lugar de encogerse
+}
+
+// Abajo a la derecha: no choca con los controles de zoom de Google ni con
+// los botones del mapa, que van abajo a la izquierda.
+.registrar {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 3;
+}
+
+@media (max-width: 640px) {
+  .usuario__nombre {
+    display: none;
+  }
+
+  // Una sola linea: partido en dos ocupaba 69px de una pantalla de 844.
+  // Se acorta el texto en vez de truncarlo con puntos suspensivos, que se
+  // lee peor y deja la frase a medias.
+  .pie {
+    padding: 10px 12px;
+    font: var(--mat-sys-body-small);
+    white-space: nowrap;
+  }
+
+  .pie__extra {
+    display: none;
+  }
+
+  .marca__escudo {
+    height: 28px;
+  }
+
+  .marca__nombre {
+    font: var(--mat-sys-title-medium);
+  }
+
+  .marca__nombre strong {
+    font-weight: 700;
+  }
+
+  // Circular y pegado a la esquina: ya no hay controles de zoom de Google
+  // compitiendo por ese sitio en tactil.
+  // 24px y no 16: por debajo queda la barra de atribucion de Google.
+  .registrar {
+    right: 16px;
+    bottom: 24px;
+  }
+}
+
+// Franja al pie. Con 6px de relleno quedaba casi invisible; 14px le dan
+// presencia sin comerse el mapa, que sigue siendo el protagonista.
+.pie {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-low);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+  text-align: center;
+}

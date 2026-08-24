@@ -1,4 +1,10 @@
-import { Injectable, inject, signal } from '@angular/core';
+import {
+  Injectable,
+  DestroyRef,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   Firestore,
   collection,
@@ -9,8 +15,10 @@ import {
   query,
   orderBy,
   onSnapshot,
+  Unsubscribe,
 } from '@angular/fire/firestore';
 import { Location } from '../models/location.interface';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class LocationService {
@@ -20,25 +28,62 @@ export class LocationService {
 
   isLoading = signal(false);
 
+  private auth = inject(AuthService);
+
+  private unsubscribe: Unsubscribe | null = null;
+
+  private listeningAs: string | null = null;
+
   constructor() {
-    this.setupRealtimeListener();
+    // El servicio vive a nivel de app, asi que no puede atarse al ciclo de vida
+    // de un componente: sigue la sesion. Al cerrarla las reglas cortan el
+    // listener, y al volver a entrar hay que reabrirlo o el mapa queda vacio.
+    effect(() => {
+      const uid = this.auth.currentUser()?.uid ?? null;
+      if (uid === this.listeningAs) {
+        return;
+      }
+      this.listeningAs = uid;
+
+      if (uid) {
+        this.setupRealtimeListener();
+      } else {
+        this.stopRealtimeListener();
+        this.locations.set([]);
+      }
+    });
+
+    inject(DestroyRef).onDestroy(() => this.stopRealtimeListener());
   }
 
   public setupRealtimeListener(): void {
+    this.stopRealtimeListener();
+
     const locationsRef = collection(this.firestore, 'locations');
     const allLocationsQuery = query(locationsRef, orderBy('subject', 'desc'));
 
-    onSnapshot(allLocationsQuery, (snapshot) => {
-      const locations: Location[] = [];
-      snapshot.forEach((doc) => {
-        locations.push({ id: doc.id, ...doc.data() } as Location);
-      });
-      this.locations.set(locations);
-    });
+    this.unsubscribe = onSnapshot(
+      allLocationsQuery,
+      (snapshot) => {
+        const locations: Location[] = [];
+        snapshot.forEach((doc) => {
+          locations.push({ id: doc.id, ...doc.data() } as Location);
+        });
+        this.locations.set(locations);
+      },
+      // Al cerrar sesión las reglas cortan el listener: lo damos de baja sin
+      // ruido. Reabrirlo es responsabilidad del effect de arriba.
+      () => {
+        this.locations.set([]);
+        this.unsubscribe = null;
+        this.listeningAs = null;
+      }
+    );
   }
 
-  refreshListener(): void {
-    this.setupRealtimeListener();
+  private stopRealtimeListener(): void {
+    this.unsubscribe?.();
+    this.unsubscribe = null;
   }
 
   async addLocation(location: Location): Promise<void> {

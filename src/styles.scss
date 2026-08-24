@@ -1,83 +1,131 @@
-// Custom Theming for Angular Material
-// For more information: https://material.angular.dev/guide/theming
+// Tema institucional de la Facultad Nacional de Ingeniería.
+// Las paletas tonales se generan a partir de los colores del escudo:
+// azul #0000FF (campo del escudo) y dorado #E8A633 (martillo y cincel).
+// Generadas con `ng generate @angular/material:m3-theme`, no escritas a mano:
+// eso garantiza que cada tono cumpla los contrastes de Material 3.
 @use "@angular/material" as mat;
+@use "./styles/theme-colors" as fni;
 
 html {
   @include mat.theme(
     (
       color: (
         theme-type: light,
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
+        primary: fni.$primary-palette,
+        tertiary: fni.$tertiary-palette,
       ),
       typography: Roboto,
       density: 0,
     )
   );
-} /* You can add global styles to this file, and also import other style files */
+}
 
-html,
-body {
-  height: 100%;
-}
-body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-}
-* {
-  margin: 0;
-  padding: 0;
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 html,
 body {
   height: 100%;
-  font-family: "Roboto", sans-serif;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
 }
 
-/* Estilos personalizados para Bottom Sheet */
+// Respeta a quien pide menos animacion en su sistema operativo.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .location-detail-panel .mat-mdc-bottom-sheet-container {
   border-radius: 16px 16px 0 0;
-  max-width: 500px;
-  margin: 0 auto;
+  padding: 0;
 }
 
-/* Estilos para formularios */
-.mat-mdc-form-field {
-  margin-bottom: 16px;
+// --- Ajustes puntuales sobre Material ---------------------------------------
+// Estos selectores tocan el DOM interno de mat-form-field y mat-option, que
+// la encapsulacion del componente no alcanza. Van aqui, acotados a su
+// contexto, en vez de con ::ng-deep, que esta desaconsejado.
+
+// Buscador flotante sobre el mapa: necesita superficie propia para leerse
+// encima de la imagen satelital.
+//
+// El contorno de un campo "outline" no es un borde: son tres piezas
+// (leading, notch, trailing) que dibujan el trazo, y el relleno lo pone otro
+// elemento. Si solo se redondea el relleno, el trazo sigue con el radio de
+// Material y la superficie sobresale por las esquinas. Por eso el radio es
+// una sola variable que aplican todas las piezas a la vez.
+.buscador {
+  --radio-buscador: 12px;
 }
 
-/* Estilos para Google Maps */
-google-map {
-  display: block;
-  height: 100%;
-  width: 100%;
+.buscador .mat-mdc-text-field-wrapper {
+  background: var(--mat-sys-surface);
+  border-radius: var(--radio-buscador);
+  box-shadow: var(--mat-sys-level2);
 }
 
-/* Spinner en botones */
-.mat-mdc-raised-button .mat-mdc-button-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.buscador .mdc-notched-outline__leading {
+  border-start-start-radius: var(--radio-buscador);
+  border-end-start-radius: var(--radio-buscador);
+  // La pieza debe ser al menos tan ancha como el radio o la curva se corta.
+  width: var(--radio-buscador);
 }
 
-/* Clases utilitarias */
-.full-width {
-  width: 100%;
+.buscador .mdc-notched-outline__trailing {
+  border-start-end-radius: var(--radio-buscador);
+  border-end-end-radius: var(--radio-buscador);
 }
 
-.text-center {
-  text-align: center;
+// Opciones de dos lineas en el panel de resultados.
+.mat-mdc-autocomplete-panel .mat-mdc-option {
+  min-height: 56px;
+  height: auto;
 }
 
-.margin-top {
-  margin-top: 16px;
+// Alto para cinco resultados mas la fila de carga: si cupieran todos, el
+// centinela del final estaria siempre visible y cargaria la lista entera de
+// golpe, que es justo lo que se quiere evitar.
+// La clase se repite a proposito: Material declara su propio max-height con
+// la misma especificidad, y sin subirla gana el suyo (256px).
+.mat-mdc-autocomplete-panel.mat-mdc-autocomplete-panel {
+  max-height: 264px;
+  border-radius: 12px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .mat-mdc-tab-header {
-    border-bottom: 1px solid #e0e0e0;
+// Material reserva 180px de ancho minimo al interior del campo; en media
+// columna eso desborda. Solo se rebaja donde hace falta.
+.horario .mat-mdc-form-field-infix {
+  min-width: 0;
+  width: auto;
+}
+
+// El panel de resultados cuelga del buscador: mismo radio para que se lean
+// como una sola pieza.
+
+
+// El formulario de registro ocupa la pantalla entera en movil: con margenes y
+// esquinas redondeadas se perdian ~70px de alto util en un formulario que ya
+// necesita desplazarse.
+@media (max-width: 640px) {
+  .dialogo-registro {
+    max-width: 100vw !important;
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh !important;
+  }
+
+  .dialogo-registro .mat-mdc-dialog-surface {
+    border-radius: 0;
   }
 }

@@ -1,68 +1,139 @@
-<div class="map-container">
-  <mat-card class="map-card">
-    <mat-card-header>
-      <mat-card-title>
-        <mat-icon fontIcon="location_on"></mat-icon>
-        Mapa de ubicaciones
-      </mat-card-title>
-      <mat-card-subtitle>
-        {{ locationCount() }} ubicación(es) registrada(s)
-      </mat-card-subtitle>
-    </mat-card-header>
+<div
+  class="lienzo"
+  tabindex="0"
+  role="application"
+  aria-label="Mapa del campus. Flechas para desplazarte, más y menos para acercar."
+  [appMapaTeclado]="mapaRef()"
+>
+  <google-map
+    height="100%"
+    width="100%"
+    [center]="mapCenter()"
+    [zoom]="mapZoom()"
+    [options]="mapOptions"
+  >
+    @for (m of marcadores(); track m.clave) {
+    <map-advanced-marker
+      [position]="{ lat: m.location.latitude, lng: m.location.longitude }"
+      [title]="tituloMarcador(m.location)"
+      [content]="m.contenido"
+      (mapClick)="abrirDetalle(m.location)"
+    />
+    }
 
-    <mat-card-content>
-      <div class="map-controls">
+    @if (nav.trazado().length >= 2) {
+    <map-polyline [path]="nav.trazado()" [options]="opcionesTrazado" />
+    <map-advanced-marker
+      [position]="nav.miPosicion()!"
+      title="Tu ubicación"
+    />
+    }
+  </google-map>
+</div>
+
+<!-- Buscador flotante. Encontrar un aula es el uso principal de la app, asi
+     que va encima del mapa. El panel de resultados es un MatAutocomplete: se
+     renderiza en un overlay, asi que ni lo recorta el mapa ni hay que
+     reimplementar navegacion por teclado ni semantica ARIA. -->
+<search class="buscador">
+  <mat-form-field
+    appearance="outline"
+    subscriptSizing="dynamic"
+    class="buscador__campo"
+  >
+    <mat-icon matPrefix fontIcon="search" class="buscador__lupa"></mat-icon>
+    <!-- Sin <mat-label>: la etiqueta flotante se coloca a caballo del borde
+         superior, y sobre una imagen satelital la mitad de arriba queda sobre
+         el mapa y la de abajo sobre el campo. El nombre accesible lo da
+         aria-label, que no depende de que haya etiqueta visible. -->
+    <input
+      matInput
+      type="text"
+      autocomplete="off"
+      placeholder="Buscar materia, docente o paralelo"
+      aria-label="Buscar aula por materia, docente o paralelo"
+      [formControl]="busqueda"
+      [matAutocomplete]="panel"
+    />
+    @if (hayBusqueda()) {
+    <button
+      matSuffix
+      mat-icon-button
+      type="button"
+      aria-label="Limpiar búsqueda"
+      (click)="limpiarBusqueda()"
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+    }
+
+    <mat-autocomplete
+      #panel="matAutocomplete"
+      [displayWith]="mostrarNombre"
+      (optionSelected)="irA($event.option.value)"
+      class="panel-busqueda"
+    >
+      @for (location of resultadosVisibles(); track location.id) {
+      <mat-option [value]="location">
+        <span class="opcion">
+          <strong class="opcion__materia">{{ location.subject }}</strong>
+          <small class="opcion__detalle">
+            {{ location.teacher }} · Paralelo {{ location.parallel }} ·
+            {{ location.schedule }}
+          </small>
+        </span>
+      </mat-option>
+      } @empty {
+      <mat-option disabled>
+        Ninguna clase coincide con «{{ termino() }}»
+      </mat-option>
+      }
+
+      <!-- Carga el siguiente tramo. mousedown se cancela para que el campo no
+           pierda el foco, que cerraria el panel. -->
+      @if (restantes() > 0) {
+      <div class="cargar-mas">
         <button
-          mat-raised-button
-          color="accent"
-          (click)="getCurrentLocation()"
-          class="location-btn"
+          type="button"
+          class="cargar-mas__boton"
+          (mousedown)="$event.preventDefault()"
+          (click)="cargarMas()"
         >
-          <mat-icon fontIcon="my_location"></mat-icon>
-          <span>Mi ubicación</span>
+          <mat-icon fontIcon="expand_more"></mat-icon>
+          <span>Ver 5 más</span>
+          <span class="cargar-mas__cuenta">{{ restantes() }} restantes</span>
         </button>
       </div>
-      <div class="map-wrapper">
-        <google-map
-          height="500px"
-          width="100%"
-          [center]="mapCenter()"
-          [zoom]="mapZoom()"
-          [options]="mapOptions"
-        >
-          @for (location of locations(); track location.id) {
-          <map-advanced-marker
-            [position]="{
-              lat: location.latitude,
-              lng: location.longitude
-            }"
-            [title]="getMarkerTitle(location)"
-            [options]="advancedMarkerOptions"
-            (mapClick)="onMarkerClick(location)"
-          >
-          </map-advanced-marker>
-          }
-        </google-map>
-
-        @if (locationCount() === 0) {
-        <div class="no-data">
-          <mat-icon fontIcon="location_off">location_off</mat-icon>
-          <p>No hay ubicaciones registradas</p>
-          <small>Registra la primera ubicación para verla en el mapa</small>
-        </div>
-        }
-      </div>
-
-      @if (locationCount() > 0) {
-      <div class="map-legend">
-        <h4>Leyenda</h4>
-        <div class="legend-item">
-          <mat-icon fontIcon="location_on" color="primary"></mat-icon>
-          <span>Ubicación de clase</span>
-        </div>
-        <small>Haz click en cualquier marcador para ver más detalles</small>
-      </div>
       }
-    </mat-card-content>
-  </mat-card>
+    </mat-autocomplete>
+  </mat-form-field>
+</search>
+
+@if (nav.activa()) {
+<app-panel-ruta (encuadrar)="encuadrarRuta()" />
+}
+
+<div class="acciones-mapa" [class.oculta]="nav.destino() !== null">
+  @if (resultados().length > 0) {
+  <button
+    mat-fab
+    type="button"
+    class="accion"
+    [extended]="!esMovil()"
+    [attr.aria-label]="esMovil() ? 'Ver todas las ubicaciones' : null"
+    [matTooltip]="esMovil() ? 'Ver todas las ubicaciones' : ''"
+    (click)="encuadrarTodas()"
+  >
+    <mat-icon fontIcon="zoom_out_map"></mat-icon>
+    @if (!esMovil()) { Ver todas }
+  </button>
+  }
 </div>
+
+@if (locationCount() === 0) {
+<div class="sin-datos" role="status">
+  <mat-icon fontIcon="location_off"></mat-icon>
+  <p class="sin-datos__titulo">Todavía no hay aulas registradas</p>
+  <p class="sin-datos__ayuda">Usa «Registrar ubicación» para añadir la primera.</p>
+</div>
+}
