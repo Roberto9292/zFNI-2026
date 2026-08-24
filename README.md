@@ -5,12 +5,14 @@ Ciudad Universitaria de la Facultad Nacional de Ingeniería (UTO, Oruro), verla
 en el mapa del campus y caminar hasta ella siguiendo una ruta trazada sobre
 calles reales.
 
-| | |
-|---|---|
-| **Aplicación publicada** | **https://fni-2026.web.app** |
-| **Repositorio** | https://github.com/Roberto9292/zFNI-2026 |
-| **Video explicativo** | _(pendiente — se añade el enlace aquí)_ |
-| **Autor** | Roberto Pablo Ugarte Gutierrez |
+Módulo I · Trabajo Final — Análisis, construcción y publicación.
+
+## Enlaces
+
+- **App en Firebase:** https://fni-2026.web.app
+- **Repositorio:** https://github.com/Roberto9292/zFNI-2026
+- **Video explicativo:** _(añade aquí el enlace al video)_
+- **Autor:** Roberto Pablo Ugarte Gutierrez
 
 ## Capturas
 
@@ -191,7 +193,23 @@ graph TB
 
 ## 4. Justificación de cada tecnología
 
-Cada decisión, con la alternativa que se descartó y el porqué.
+### Resumen
+
+| Tecnología | Por qué se eligió | Alternativa descartada | Motivo del descarte |
+|---|---|---|---|
+| **Angular 19** | Router, formularios, HTTP e inyección en la caja; signals + `OnPush` para repintar solo lo que cambia | React | Obligaría a elegir y unir router, formularios, HTTP y estado por separado: más decisiones y más riesgo con un solo autor |
+| **Angular Material** | `bottom-sheet`, `autocomplete`, `timepicker` y diálogos ya accesibles y con foco resuelto | Tailwind CSS / Bootstrap | Tailwind solo da estilos: habría que construir esos componentes y su accesibilidad desde cero. Bootstrap es visualmente de escritorio y esto se usa con el pulgar |
+| **Cloud Firestore** | Tiempo real con `onSnapshot` sin código de sincronización; modelo documental que encaja con aulas sin relaciones | Realtime Database / PostgreSQL | RTDB complica consultar y ordenar sobre su árbol único. PostgreSQL exigiría servidor propio, API REST y WebSockets a mano para guardar seis campos |
+| **Firebase Auth** | Hash, refresco de token, sesión persistente y OAuth con Google resueltos; la identidad llega verificada a las reglas | Autenticación propia con JWT | Servidor, base de usuarios, política de contraseñas y rotación de tokens: donde aparecen los agujeros más caros |
+| **Firebase Hosting** | Requisito de la consigna; CDN, HTTPS, rewrite de SPA y un solo despliegue para app y reglas | Cloud Run / Vercel / Netlify | Cloud Run es para contenedores y aquí no hay servidor. Vercel/Netlify partirían el stack en dos proveedores |
+| **Google Maps Platform** | La capa satelital permite reconocer los edificios a ojo, que es como se orienta quien está parado en el campus | Leaflet + OpenStreetMap | La FNI está incompleta en OSM y su imagen satelital de Oruro no da el detalle necesario. Aquí el mapa **es** el producto |
+| **OSRM** | Router de OpenStreetMap con servidor público: rutas por calles sin clave ni tarjeta | Directions API de Google | **Exige facturación activa**, justo lo que este proyecto no tiene. Extraer rutas de google.com/maps lo prohíben sus términos |
+| **Signals** | El estado son unos pocos valores leídos desde plantillas; `computed` deriva resultados sin suscripciones que cerrar | NgRx | Acciones, reducers, efectos y selectores rinden con estados entrelazados; aquí solo añadirían archivos |
+| **Bun** | Instalación mucho más rápida, compatible con npm | npm | Ninguno de peso: sigue funcionando igual. `bun.lock` está en el repo |
+| **Sin backend propio** | Cero infraestructura que mantener y desarrollo más rápido | Servidor propio / Cloud Functions | Innecesario para el alcance. Si aparecen roles, la respuesta serían Functions, no un servidor |
+
+### El detalle de cada decisión
+
 
 ### Angular 19 (standalone + signals) — en lugar de React
 
@@ -465,19 +483,30 @@ src/
 | firebase-tools | 15.28.1 | Despliegue |
 | Karma + Jasmine | — | Configurados por el CLI; **sin tests escritos** |
 
-### Servicios externos
+### Servicios gestionados (backend delegado)
+
+Todo el proyecto corre en el **plan gratuito Spark** de Firebase; no hay
+facturación activa en ninguna cuenta.
 
 | Servicio | Uso | Coste |
 |---|---|---|
-| **Firebase Hosting** | Publicación de la aplicación | Plan gratuito (Spark) |
-| **Firebase Authentication** | Email/contraseña y OAuth con Google | Plan gratuito |
-| **Cloud Firestore** | Base de datos y tiempo real | Plan gratuito |
+| **Firebase Hosting** | Publicación de la aplicación | Gratuito (Spark) |
+| **Firebase Authentication** | Email/contraseña y OAuth con Google | Gratuito |
+| **Cloud Firestore** | Base de datos y tiempo real | Gratuito |
 | **Firebase Analytics** | Métricas de uso | Gratuito |
-| **Google Maps JavaScript API** | Mapa, tiles y marcadores avanzados | Cuota gratuita mensual |
-| **Google Maps Studio** | Estilo del mapa (Map ID `fb8757a3bfd70c7f9dcba22a`) | Gratuito |
-| **OSRM** (`router.project-osrm.org`) | Rutas peatonales | Servidor público, sin garantía |
-| **Nominatim** (OpenStreetMap) | Geocodificación del centro del campus, una sola vez, en desarrollo | Gratuito |
-| **Google Fonts** | Tipografía Roboto e iconos Material | Gratuito |
+
+### APIs y recursos externos consumidos
+
+| Recurso | Endpoint / identificador | Licencia o condiciones |
+|---|---|---|
+| **OSRM** — rutas a pie | `https://router.project-osrm.org/route/v1/foot/{lng},{lat};{lng},{lat}?overview=full&geometries=geojson` | Servidor público de demostración, sin garantía de servicio |
+| **Google Maps JavaScript API** | `https://maps.googleapis.com/maps/api/js?libraries=marker` | Cuota gratuita mensual; sujeta a los términos de Google Maps Platform |
+| **Map ID (Maps Studio)** | `fb8757a3bfd70c7f9dcba22a` | Estilo propio del mapa |
+| **Nominatim** (OpenStreetMap) | Geocodificación del centro del campus, una sola vez en desarrollo | ODbL; el resultado quedó fijado en `core/constants/fni.ts` |
+| **Google Fonts** | Roboto y Material Icons | Open Font License |
+
+Los datos de las aulas **no vienen de ninguna API externa**: los introducen los
+propios usuarios y se guardan en la colección `locations` de Firestore.
 
 ### Código de terceros incorporado
 
