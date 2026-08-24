@@ -1,7 +1,10 @@
 @if (nav.destino(); as destino) {
 <aside class="panel-ruta" role="complementary" aria-label="Ruta activa">
   <header class="panel-ruta__cabecera">
-    <mat-icon fontIcon="directions_walk" class="panel-ruta__icono"></mat-icon>
+    <mat-icon
+      [fontIcon]="nav.modo() === 'pie' ? 'directions_walk' : 'directions_car'"
+      class="panel-ruta__icono"
+    ></mat-icon>
     <div class="panel-ruta__titulo">
       <strong>{{ destino.subject }}</strong>
       <small>{{ destino.teacher }} · Paralelo {{ destino.parallel }}</small>
@@ -18,6 +21,23 @@
     </button>
   </header>
 
+  <mat-button-toggle-group
+    class="panel-ruta__modo"
+    hideSingleSelectionIndicator
+    aria-label="Cómo te desplazas"
+    [value]="nav.modo()"
+    (change)="alCambiarModo($event.value)"
+  >
+    <mat-button-toggle value="pie" aria-label="A pie">
+      <mat-icon fontIcon="directions_walk"></mat-icon>
+      A pie
+    </mat-button-toggle>
+    <mat-button-toggle value="vehiculo" aria-label="En vehículo">
+      <mat-icon fontIcon="directions_car"></mat-icon>
+      Vehículo
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+
   @if (nav.metros() !== null) {
   <div class="panel-ruta__cifras">
     <div class="cifra">
@@ -28,7 +48,7 @@
     @if (nav.minutos(); as min) {
     <div class="cifra">
       <span class="cifra__valor">{{ min }} min</span>
-      <span class="cifra__etiqueta">a pie</span>
+      <span class="cifra__etiqueta">{{ nav.modoTexto() }}</span>
     </div>
     }
   </div>

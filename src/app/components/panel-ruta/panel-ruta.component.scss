@@ -153,3 +153,21 @@
     display: none;
   }
 }
+
+// Selector de modo: dentro del campus no solo se camina, tambien se circula
+// en auto o moto por las vias internas.
+.panel-ruta__modo {
+  margin: 0 16px 4px;
+  align-self: stretch;
+
+  .mat-button-toggle {
+    flex: 1;
+  }
+
+  mat-icon {
+    margin-right: 4px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}

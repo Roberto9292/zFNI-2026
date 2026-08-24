@@ -5,8 +5,10 @@ import {
   output,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { NavegacionService } from '../../core/services/navegacion.service';
+import { ModoViaje } from '../../core/services/ruta.service';
 
 /**
  * Ficha de la ruta en marcha: destino, distancia, tiempo y acciones.
@@ -17,7 +19,7 @@ import { NavegacionService } from '../../core/services/navegacion.service';
  */
 @Component({
   selector: 'app-panel-ruta',
-  imports: [MatButtonModule, MatIconModule],
+  imports: [MatButtonModule, MatButtonToggleModule, MatIconModule],
   templateUrl: './panel-ruta.component.html',
   styleUrls: ['./panel-ruta.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,15 +30,25 @@ export class PanelRutaComponent {
   /** Encuadrar es cosa del mapa, no del panel: se delega hacia arriba. */
   readonly encuadrar = output<void>();
 
-  /** Navegación paso a paso real, delegada en la app de Google Maps. */
+  /** Cambia entre ir a pie y en vehículo sin perder la ruta en marcha. */
+  alCambiarModo(modo: ModoViaje): void {
+    this.nav.cambiarModo(modo);
+  }
+
+  /**
+   * Navegación paso a paso real, delegada en la app de Google Maps, en el
+   * mismo modo que se está viendo aquí.
+   */
   abrirNavegacion(): void {
     const destino = this.nav.destino();
     if (!destino) {
       return;
     }
 
+    const viaje = this.nav.modo() === 'pie' ? 'walking' : 'driving';
+
     window.open(
-      `https://www.google.com/maps/dir/?api=1&destination=${destino.latitude},${destino.longitude}&travelmode=walking`,
+      `https://www.google.com/maps/dir/?api=1&destination=${destino.latitude},${destino.longitude}&travelmode=${viaje}`,
       '_blank',
       'noopener'
     );

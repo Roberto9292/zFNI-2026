@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Location } from '../models/location.interface';
-import { RutaService } from './ruta.service';
+import { ModoViaje, RutaService } from './ruta.service';
 
 /**
  * Sigue al usuario hasta un destino: mantiene la posición, pide la ruta por
@@ -13,10 +13,20 @@ import { RutaService } from './ruta.service';
 export class NavegacionService {
   private rutas = inject(RutaService);
 
-  /** Metros que hay que moverse para pedir una ruta nueva. */
-  private static readonly UMBRAL_RECALCULO = 25;
+  /**
+   * Metros que hay que moverse para pedir una ruta nueva. En vehiculo se
+   * avanza mucho mas rapido, asi que con el umbral de a pie se pediria una
+   * ruta cada pocos segundos sin que la anterior haya envejecido.
+   */
+  private static readonly UMBRAL_RECALCULO: Record<ModoViaje, number> = {
+    pie: 25,
+    vehiculo: 80,
+  };
 
   readonly destino = signal<Location | null>(null);
+
+  /** Como se desplaza el usuario: dentro del campus tambien se circula. */
+  readonly modo = signal<ModoViaje>('pie');
   readonly miPosicion = signal<google.maps.LatLngLiteral | null>(null);
   readonly precision = signal<number | null>(null);
 
@@ -28,6 +38,11 @@ export class NavegacionService {
   readonly aproximada = signal(false);
 
   readonly activa = computed(() => this.destino() !== null);
+
+  /** Etiqueta del tiempo estimado, que depende del modo. */
+  readonly modoTexto = computed(() =>
+    this.modo() === 'pie' ? 'a pie' : 'en vehículo'
+  );
 
   readonly distanciaTexto = computed(() => {
     const m = this.metros();
@@ -59,13 +74,18 @@ export class NavegacionService {
    * Empieza a seguir la posición hasta `destino`.
    * @returns false si el navegador no ofrece geolocalización.
    */
-  iniciar(destino: Location, alFallar: () => void): boolean {
+  iniciar(
+    destino: Location,
+    alFallar: () => void,
+    modo: ModoViaje = 'pie'
+  ): boolean {
     if (!navigator.geolocation) {
       return false;
     }
 
     this.detener();
     this.destino.set(destino);
+    this.modo.set(modo);
 
     this.vigilanciaId = navigator.geolocation.watchPosition(
       (posicion) => {
@@ -94,6 +114,7 @@ export class NavegacionService {
     }
 
     this.destino.set(null);
+    this.modo.set('pie');
     this.miPosicion.set(null);
     this.precision.set(null);
     this.trazado.set([]);
@@ -101,6 +122,24 @@ export class NavegacionService {
     this.minutos.set(null);
     this.aproximada.set(false);
     this.origenCalculado = null;
+  }
+
+  /**
+   * Cambia entre ir a pie y en vehículo sobre la ruta en marcha, sin volver a
+   * pedir la posición: ya la tenemos, solo hay que trazar el camino otra vez.
+   */
+  cambiarModo(modo: ModoViaje): void {
+    if (this.modo() === modo) {
+      return;
+    }
+
+    this.modo.set(modo);
+
+    const destino = this.destino();
+    const aqui = this.miPosicion();
+    if (destino && aqui) {
+      void this.recalcular(aqui, destino, true);
+    }
   }
 
   /**
@@ -117,16 +156,19 @@ export class NavegacionService {
       ? NavegacionService.metrosEntre(this.origenCalculado, origen)
       : Infinity;
 
-    if (!primera && movido < NavegacionService.UMBRAL_RECALCULO) {
+    const modo = this.modo();
+
+    if (!primera && movido < NavegacionService.UMBRAL_RECALCULO[modo]) {
       return;
     }
 
     this.origenCalculado = origen;
     const meta = { lat: destino.latitude, lng: destino.longitude };
-    const ruta = await this.rutas.calcular(origen, meta);
+    const ruta = await this.rutas.calcular(origen, meta, modo);
 
-    // El usuario pudo cerrar la ruta mientras se resolvía la petición.
-    if (this.destino()?.id !== destino.id) {
+    // El usuario pudo cerrar la ruta o cambiar de modo mientras se resolvía
+    // la petición: lo que llegue ya no corresponde a lo que se ve.
+    if (this.destino()?.id !== destino.id || this.modo() !== modo) {
       return;
     }
 

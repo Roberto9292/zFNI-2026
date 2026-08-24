@@ -83,7 +83,8 @@ ese enlace.
 ### Los dos casos de uso reales
 
 **1. "¿Dónde queda mi clase?"** — El caso obvio. Se busca la materia y la app
-la sitúa en el mapa y traza la ruta a pie desde donde uno esté, sobre calles
+la sitúa en el mapa y traza la ruta desde donde uno esté —a pie o en
+vehículo— sobre calles
 reales.
 
 **2. "¿Dónde está este docente ahora?"** — El caso que no es obvio, y que
@@ -112,15 +113,26 @@ resuelve preguntando de puerta en puerta.
 
 ### Cómo condicionó el diseño
 
-Al campus se **llega** en auto, en minibús o en el transporte universitario;
-pero una vez dentro, **entre bloques se camina**. Por eso la ruta que traza la
-aplicación es peatonal: el tramo problemático no es llegar a la Ciudadela, es
-encontrar el aula una vez que ya se está en ella.
+**Dentro del campus no todos se mueven igual.** La Ciudadela tiene vías
+internas: hay quien cruza de un bloque a otro caminando, y quien lo hace en
+auto particular o en moto, sobre todo cuando el salto es entre extremos
+opuestos o se llega justo a la hora. Y al campus se llega, además, en minibús
+y en el transporte universitario de la UTO.
 
-Y ese tramo se recorre **al aire libre, con una mano ocupada y con prisa**. De
-ahí tres decisiones: la aplicación se diseñó para móvil primero, la pantalla
-principal es el mapa y no un menú, y la búsqueda ignora acentos y mayúsculas,
-porque nadie escribe `Cálculo` con tilde yendo tarde a clase.
+Por eso la ruta **no asume que se va a pie**: el panel deja elegir entre
+**a pie** y **en vehículo**, y la estimación de tiempo cambia con esa
+elección — un tramo de 880 m son unos 11 minutos caminando y unos 3 en
+vehículo. El destino es el mismo; lo que cambia es cuánto falta para llegar y
+qué modo de navegación se abre en Google Maps al pulsar "Navegar".
+
+Lo que no cambia es el problema de fondo: **en cualquiera de los dos modos hay
+que saber a qué punto ir.** Encontrar el aula es el tramo difícil, no
+recorrerlo.
+
+Y ese tramo se resuelve **al aire libre, con una mano ocupada y con prisa**.
+De ahí tres decisiones más: la aplicación se diseñó para móvil primero, la
+pantalla principal es el mapa y no un menú, y la búsqueda ignora acentos y
+mayúsculas, porque nadie escribe `Cálculo` con tilde yendo tarde a clase.
 
 > **Fuentes consultadas:** [FNI — Ubicación de Aulas para Nuevos](https://www.fni.uto.edu.bo/index.php/publicaciones/ubicacion-de-aulas-nuevos) ·
 > [UTO — Transporte universitario](https://www.uto.edu.bo/transporte-uto/) ·
@@ -143,7 +155,7 @@ porque nadie escribe `Cálculo` con tilde yendo tarde a clase.
 | **Búsqueda de un aula** | Por materia, carrera, bloque o paralelo. Insensible a mayúsculas y acentos: `calculo` encuentra `Cálculo`. Resultados paginados de 5 en 5 y marcados en el mapa. |
 | **Búsqueda de un docente** | Escribir el nombre devuelve **todas las clases que dicta**, cada una con su materia, paralelo, horario y ubicación en el mapa. Es lo que permite ubicarlo aunque la materia en la que está ahora no sea la que uno cursa. |
 | **Detalle** | Panel inferior con todos los datos del aula: materia, docente, carrera, bloque, paralelo y horario, más el acceso a la ruta. |
-| **Ruta a pie** | Trazado por calles reales con seguimiento del GPS en vivo, distancia, tiempo estimado y recálculo automático al alejarse más de 25 m del punto donde se calculó. Es el tramo que importa: al campus se llega en vehículo, pero entre bloques se camina. |
+| **Ruta a pie o en vehículo** | Trazado por calles reales con seguimiento del GPS en vivo, distancia y tiempo estimado. El panel permite alternar entre **a pie** y **en vehículo** sobre la ruta en marcha, sin volver a empezar: cambia la estimación de tiempo y el modo con el que se abre Google Maps. El recálculo automático se dispara a los 25 m caminando y a los 80 m en vehículo, porque en auto se avanza mucho más rápido y con el umbral peatonal se pediría una ruta cada pocos segundos. |
 | **Entrega a Google Maps** | Botón para abrir la navegación paso a paso en la app de Google Maps. |
 | **Tiempo real** | Un aula registrada desde un dispositivo aparece en los demás sin recargar (listener de Firestore). |
 | **Accesibilidad** | Mapa navegable con teclado (flechas y `+`/`-`), etiquetas ARIA, foco gestionado en diálogos. |
@@ -157,12 +169,16 @@ Se dejó fuera de forma deliberada, no por olvido:
   clases con su horario y el usuario compara con la hora; no cruza el horario
   con el reloj para señalar una sola. Es el siguiente paso natural, y es
   pequeño.
-- **Rutas en vehículo y cómo llegar al campus desde la ciudad.** La ruta que
-  se traza es **peatonal**, entre el punto donde está el usuario y el aula.
-  Para llegar en auto o en transporte público hasta la Ciudadela, el botón de
-  Google Maps hace ese trabajo mejor. Añadir perfil vehicular sería cambiar
-  `foot` por `driving` en la llamada a OSRM, pero no resuelve el problema que
-  motivó la aplicación: dentro del campus se camina.
+- **Trazados distintos por modo.** Se elige a pie o en vehículo y la
+  estimación de tiempo cambia, pero **el camino dibujado es el mismo**: el
+  servidor público de OSRM enruta con perfil de coche aunque se le pida
+  `foot`. Se verificó pidiendo el mismo tramo con ambos perfiles y devuelve
+  geometría y duración idénticas. La app manda el perfil correcto igualmente,
+  para que hospedar un OSRM propio sea cambiar una URL y nada más.
+- **Cómo llegar al campus desde la ciudad.** La ruta va desde donde está el
+  usuario hasta el aula. Para el trayecto en minibús o transporte
+  universitario hasta la Ciudadela, el botón de Google Maps hace ese trabajo
+  mejor.
 - **Editar y borrar aulas desde la interfaz.** Las operaciones existen en
   `LocationService` pero no se expusieron: sin roles de usuario, cualquiera
   podría borrar el trabajo de otro. La UI llega cuando existan los permisos.
@@ -218,7 +234,7 @@ graph TB
     end
 
     subgraph EXT["🌍 SERVICIO EXTERNO"]
-        OSRM["<b>OSRM</b> — router de OpenStreetMap<br/>servidor público de demostración<br/>rutas peatonales por calles"]
+        OSRM["<b>OSRM</b> — router de OpenStreetMap<br/>servidor público de demostración<br/>rutas por calles (perfil pie / vehículo)"]
     end
 
     NAV -.->|"descarga inicial<br/>HTTPS"| HOST
@@ -226,7 +242,7 @@ graph TB
     SDK <-->|"onSnapshot · addDoc<br/>WebSocket"| FS
     SDK -->|"tiles e imágenes"| MAPS
     SDK --> AN
-    SRV -->|"HTTP GET<br/>/route/v1/foot"| OSRM
+    SRV -->|"HTTP GET<br/>/route/v1/foot · /driving"| OSRM
     AUTH -.->|"identidad para<br/>validar reglas"| RULES
 
     classDef cliente fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d1b2a
@@ -251,7 +267,7 @@ graph TB
 | `filtrar-ubicaciones.ts` | Navegador | Función **pura**, fuera del componente: se puede probar sin montar un mapa ni Angular. |
 | Bundle estático | Firebase Hosting (CDN de Google) | Entrega de HTML/JS/CSS. Los assets con hash se cachean un año; el `index.html`, nunca. |
 | Reglas de Firestore | Servidores de Google | **La única validación no eludible.** Todo lo que valide el navegador es sugerencia; esto es la puerta. |
-| Cálculo de rutas | Servidor público de OSRM | Geometría del camino a pie. |
+| Cálculo de rutas | Servidor público de OSRM | Geometría del camino entre el usuario y el aula. |
 | Tiles del mapa | Google Maps Platform | Imágenes del campus y estilo. |
 
 ### Flujo completo de una consulta
@@ -389,9 +405,10 @@ este proyecto no tiene. Se descartó también extraer rutas de `google.com/maps`
 para redibujarlas: lo prohíben sus términos de uso.
 
 **Lo que esto cuesta, dicho claro:** el servidor público de OSRM no ofrece
-garantía de disponibilidad y, aunque se le pida perfil `foot`, enruta con
-perfil de coche — su duración no sirve, así que el tiempo a pie se calcula
-aquí a 5 km/h. Y cuando OSRM no responde, la app cae a línea recta y **marca
+garantía de disponibilidad y, aunque se le pida perfil `foot`, enruta siempre
+con perfil de coche: se comprobó pidiendo el mismo tramo con ambos perfiles y
+devuelve geometría y duración idénticas. Por eso su duración solo se aprovecha
+en modo vehículo, y el tiempo a pie se calcula aquí a 5 km/h. Y cuando OSRM no responde, la app cae a línea recta y **marca
 esa distancia como aproximada** en lugar de mentir. Para producción real
 tocaría hospedar un OSRM propio o pagar Directions.
 
@@ -581,7 +598,7 @@ facturación activa en ninguna cuenta.
 
 | Recurso | Endpoint / identificador | Licencia o condiciones |
 |---|---|---|
-| **OSRM** — rutas a pie | `https://router.project-osrm.org/route/v1/foot/{lng},{lat};{lng},{lat}?overview=full&geometries=geojson` | Servidor público de demostración, sin garantía de servicio |
+| **OSRM** — rutas por calles | `https://router.project-osrm.org/route/v1/{foot\|driving}/{lng},{lat};{lng},{lat}?overview=full&geometries=geojson` | Servidor público de demostración, sin garantía de servicio |
 | **Google Maps JavaScript API** | `https://maps.googleapis.com/maps/api/js?libraries=marker` | Cuota gratuita mensual; sujeta a los términos de Google Maps Platform |
 | **Map ID (Maps Studio)** | `fb8757a3bfd70c7f9dcba22a` | Estilo propio del mapa |
 | **Nominatim** (OpenStreetMap) | Geocodificación del centro del campus, una sola vez en desarrollo | ODbL; el resultado quedó fijado en `core/constants/fni.ts` |
