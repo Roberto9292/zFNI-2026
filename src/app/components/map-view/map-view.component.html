@@ -50,7 +50,7 @@
       matInput
       type="text"
       autocomplete="off"
-      placeholder="Buscar materia, docente o paralelo"
+      placeholder="Buscar materia, docente, bloque o carrera"
       aria-label="Buscar aula por materia, docente o paralelo"
       [formControl]="busqueda"
       [matAutocomplete]="panel"
@@ -81,6 +81,17 @@
             {{ location.teacher }} · Paralelo {{ location.parallel }} ·
             {{ location.schedule }}
           </small>
+          <!-- El bloque es por lo que mas se busca cuando uno no sabe donde
+               queda el aula: se muestra para que se vea por que coincidio. -->
+          @if (location.block) {
+          <small class="opcion__bloque">
+            <mat-icon fontIcon="location_on" class="opcion__icono"></mat-icon>
+            {{ location.block }}
+            @if (location.career) {
+            <span class="opcion__carrera">· {{ location.career }}</span>
+            }
+          </small>
+          }
         </span>
       </mat-option>
       } @empty {

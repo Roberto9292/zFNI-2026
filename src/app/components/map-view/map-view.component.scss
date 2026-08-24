@@ -59,6 +59,30 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+// El bloque va en su propia linea y destacado: es la respuesta a "donde
+// queda", que es justo lo que no sabe quien busca.
+.opcion__bloque {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font: var(--mat-sys-label-small);
+  color: var(--mat-sys-primary);
+}
+
+.opcion__icono {
+  flex: none;
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.opcion__carrera {
+  color: var(--mat-sys-on-surface-variant);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 // --- Acciones flotantes -----------------------------------------------------
 
 .acciones-mapa {

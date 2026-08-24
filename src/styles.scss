@@ -87,19 +87,22 @@ body {
   border-end-end-radius: var(--radio-buscador);
 }
 
-// Opciones de dos lineas en el panel de resultados.
+// Opciones de tres lineas en el panel de resultados: materia, detalle y
+// bloque.
 .mat-mdc-autocomplete-panel .mat-mdc-option {
   min-height: 56px;
   height: auto;
 }
 
-// Alto para cinco resultados mas la fila de carga: si cupieran todos, el
-// centinela del final estaria siempre visible y cargaria la lista entera de
-// golpe, que es justo lo que se quiere evitar.
+// El panel no debe mostrar el tramo entero: si cupieran los cinco resultados
+// mas la fila de carga, el centinela del final estaria siempre visible y
+// cargaria la lista completa de golpe, que es justo lo que se quiere evitar.
+// Con la linea del bloque cada opcion pasa de ~52px a ~72px, asi que la altura
+// sube para seguir mostrando unos cuatro y dejar el resto tras el scroll.
 // La clase se repite a proposito: Material declara su propio max-height con
 // la misma especificidad, y sin subirla gana el suyo (256px).
 .mat-mdc-autocomplete-panel.mat-mdc-autocomplete-panel {
-  max-height: 264px;
+  max-height: 300px;
   border-radius: 12px;
 }
 
