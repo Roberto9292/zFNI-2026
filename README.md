@@ -393,7 +393,7 @@ Las claves de Firebase y de Google Maps están en el código
 fuga**: en una aplicación de navegador esas claves se entregan al cliente por
 definición, viajen donde viajen. Lo que las protege no es esconderlas, sino
 las **reglas de Firestore** y la **restricción por dominio** de la clave de
-Maps en Google Cloud Console. Ver la sección de estado más abajo.
+Maps en Google Cloud Console.
 
 Para apuntar a otro proyecto de Firebase: cambiar el bloque `initializeApp` de
 `src/app/app.config.ts`, la clave del `<script>` de `src/index.html` y el
@@ -507,50 +507,6 @@ facturación activa en ninguna cuenta.
 
 Los datos de las aulas **no vienen de ninguna API externa**: los introducen los
 propios usuarios y se guardan en la colección `locations` de Firestore.
-
-### Código de terceros incorporado
-
-No se copió código de terceros al repositorio. Todo el código de
-`src/` es propio; lo de terceros entra como dependencia declarada en
-`package.json`. Las licencias de las dependencias quedan recogidas en
-`dist/3rdpartylicenses.txt` al compilar.
-
-Dos algoritmos son implementaciones propias de fórmulas públicas y conocidas:
-
-- **Fórmula del haversine** (`NavegacionService.metrosEntre`), para la
-  distancia entre dos coordenadas.
-- **Normalización Unicode NFD** para quitar acentos en la búsqueda
-  (`filtrar-ubicaciones.ts`), usando la API estándar del navegador.
-
-### Asistencia de IA
-
-Se usó **Claude Code** (Anthropic) como asistente durante el desarrollo, para
-refactorizar componentes, documentar decisiones en comentarios y redactar este
-README. Todas las decisiones de arquitectura y tecnología descritas arriba son
-del autor; el código fue revisado antes de integrarse.
-
----
-
-## Estado conocido y trabajo pendiente
-
-Se declara de frente, porque afecta a cómo debe leerse el proyecto. El detalle
-está en [`PENDIENTES.md`](PENDIENTES.md).
-
-- **🔴 Las reglas de Firestore son demasiado permisivas.** Hoy
-  `allow read, write: if request.auth != null` deja que cualquier usuario
-  registrado edite o borre las aulas de todos. Es el motivo por el que editar
-  y borrar no están en la interfaz, pero la API sigue expuesta. Es lo primero
-  a corregir.
-- **🔴 La clave de Google Maps no tiene restricción de dominio.** Se verificó
-  que responde desde cualquier referrer. Debe limitarse por referrer HTTP a
-  `fni-2026.web.app` en Google Cloud Console, o un tercero puede consumir la
-  cuota.
-- **🟡 OSRM depende de un servidor público de demostración**, sin garantía de
-  disponibilidad. La app degrada a línea recta cuando falla, marcándola como
-  aproximada.
-- **🟡 Sin pruebas automatizadas.** `filtrarUbicaciones` y
-  `NavegacionService.metrosEntre` son funciones puras y serían el punto
-  natural por donde empezar.
 
 ---
 
