@@ -1,9 +1,10 @@
 # FNI Go — Aulas del campus
 
-Aplicación web para encontrar en qué aula se dicta una clase dentro de la
-Ciudad Universitaria de la Facultad Nacional de Ingeniería (UTO, Oruro), verla
-en el mapa del campus y caminar hasta ella siguiendo una ruta trazada sobre
-calles reales.
+Aplicación web para **encontrar aulas y docentes** dentro de la Ciudad
+Universitaria de la Facultad Nacional de Ingeniería (UTO, Oruro). Se busca una
+materia —o el nombre de un docente, que devuelve todas las clases que dicta con
+su horario— y la aplicación la sitúa en el mapa del campus y traza la ruta a
+pie hasta ella sobre calles reales.
 
 Módulo I · Trabajo Final — Análisis, construcción y publicación.
 
@@ -31,35 +32,55 @@ Módulo I · Trabajo Final — Análisis, construcción y publicación.
 
 ## 1. El problema y a quién afecta
 
-En la FNI el horario oficial dice *qué* materia se dicta, *cuándo* y en qué
-aula — pero identifica el aula con un código (`Bloque B, Aula 12`) que solo
-sirve si uno ya sabe dónde queda el bloque B. El campus es abierto, con varios
-bloques dispersos, sin nomenclatura visible desde fuera y con edificios que se
-parecen entre sí. La información de *dónde está* ese código nunca estuvo en un
-mapa: vive en la memoria de quienes llevan años ahí.
+La Ciudad Universitaria de la UTO es **grande y abierta**: varios bloques
+repartidos por un campus que se recorre a pie, sin carteles visibles desde
+fuera y con edificios que se parecen entre sí. Quien ya lleva años ahí se
+mueve de memoria. **Quien es nuevo, no.**
 
-**A quién afecta, en orden de gravedad:**
+El horario oficial dice *qué* materia se dicta, *cuándo* y en qué aula — pero
+identifica el aula con un código, `Bloque B, Aula 12`, que solo sirve si uno
+ya sabe dónde queda el bloque B. Ese dato, el de *dónde está*, nunca estuvo en
+un mapa: vive en la memoria de la gente. Así que el estudiante nuevo hace lo
+único que puede hacer: **caminar el campus preguntando**, y llegar tarde.
 
-- **Estudiantes de primer año y de nuevo ingreso.** Son los más golpeados.
-  Llegan con un horario que no pueden traducir a un lugar físico y pierden los
-  primeros minutos de clase —o la clase entera— preguntando a desconocidos.
-  El costo se concentra justo en las primeras semanas, que es cuando peor
-  sienta llegar tarde.
-- **Estudiantes que cursan materias de otra carrera o de otro bloque.** Conocen
-  su propio edificio, no el resto del campus.
-- **Docentes suplentes e invitados**, que reciben una asignación de aula sin
-  ninguna referencia geográfica.
-- **Visitantes** en defensas de tesis, congresos o exámenes de admisión, que
-  van una sola vez y a un lugar que nunca vieron.
+El problema, entonces, no es que falten datos. Es que **el dato que existe
+(el aula) no está enlazado a una coordenada**. FNI Go es ese enlace: convierte
+un código de aula en un punto del mapa y en un camino hasta él.
 
-El problema no es la falta de datos, sino que el dato existente (*aula*) no
-está enlazado a una coordenada. **FNI Go es ese enlace**: convierte un código
-de aula en un punto en el mapa y en un camino hasta él.
+### Los dos casos de uso reales
 
-Un detalle que condicionó el diseño: el uso real ocurre **caminando, al aire
-libre, con una mano ocupada y con prisa**. Por eso la aplicación se diseñó
-para móvil primero, la búsqueda tolera errores de tipeo y acentos, y la
-pantalla principal es el mapa, no un menú.
+**1. "¿Dónde queda mi clase?"** — El caso obvio. Se busca la materia y la app
+responde con el punto exacto en el mapa y la ruta a pie desde donde uno esté.
+
+**2. "¿Dónde está este docente ahora?"** — El caso que no es obvio, y que
+resultó igual de útil. Buscar a un docente en el campus es un problema
+cotidiano: hay que consultarle una nota, entregar un trabajo, pedirle una
+firma. Pero un docente no está en un solo sitio: **dicta varias materias, en
+distintos bloques y a distintas horas**.
+
+Como cada aula registrada guarda **quién la dicta, qué materia, en qué paralelo
+y en qué horario**, buscar el nombre del docente devuelve **todas sus clases a
+la vez**. Comparando con la hora actual se sabe en cuál de ellas está en este
+momento — aunque sea una materia que uno ni siquiera cursa. La aplicación no
+rastrea a nadie: cruza el horario que ya es público con el mapa, que es
+justamente lo que hoy hay que reconstruir preguntando de puerta en puerta.
+
+### A quién afecta
+
+| Quién | Por qué le afecta |
+|---|---|
+| **Estudiantes de nuevo ingreso** | Los más golpeados. Llegan con un horario que no pueden traducir a un lugar físico, y el costo se concentra en las primeras semanas, que es cuando peor sienta llegar tarde. |
+| **Estudiantes que cursan materias de otra carrera o bloque** | Conocen su propio edificio, no el resto del campus. |
+| **Cualquier estudiante que necesite ubicar a un docente** | Notas, trámites, firmas, consultas. Hoy se resuelve recorriendo bloques a ciegas o esperando en un pasillo. |
+| **Docentes suplentes e invitados** | Reciben una asignación de aula sin ninguna referencia geográfica. |
+| **Visitantes** | Defensas de tesis, congresos, exámenes de admisión: van una sola vez, a un lugar que nunca vieron. |
+
+### Cómo condicionó el diseño
+
+El uso real ocurre **caminando, al aire libre, con una mano ocupada y con
+prisa**. De ahí tres decisiones: la aplicación se diseñó para móvil primero,
+la pantalla principal es el mapa y no un menú, y la búsqueda ignora acentos y
+mayúsculas, porque nadie escribe `Cálculo` con tilde yendo tarde a clase.
 
 ---
 
@@ -70,11 +91,12 @@ pantalla principal es el mapa, no un menú.
 | Función | Detalle |
 |---|---|
 | **Autenticación** | Registro e inicio de sesión con email y contraseña, e inicio de sesión con Google. Sesión persistente entre recargas. |
-| **Mapa del campus** | Vista híbrida (satélite + calles) centrada en la Ciudad Universitaria, con estilo propio definido en Google Maps Studio. |
-| **Registro de aulas** | Formulario en diálogo: materia, docente, carrera, bloque, paralelo y horario (con validación de que la hora de fin sea posterior a la de inicio). La coordenada se fija haciendo clic en el mapa, arrastrando el marcador o tomando el GPS del dispositivo. |
-| **Búsqueda** | Por materia, docente, carrera, bloque, paralelo u horario. Insensible a mayúsculas y acentos: `calculo` encuentra `Cálculo`. Resultados paginados de 5 en 5. |
-| **Detalle** | Panel inferior con todos los datos del aula y accesos a la ruta. |
-| **Ruta a pie** | Trazado por calles reales con seguimiento del GPS en vivo, distancia, tiempo estimado y recálculo automático al alejarse más de 25 m. |
+| **Mapa del campus** | Vista híbrida (satélite + calles) centrada en la Ciudad Universitaria, con estilo propio definido en Google Maps Studio. La capa satelital permite reconocer los edificios a ojo. |
+| **Registro de aulas** | Formulario en diálogo: materia, **docente**, carrera, bloque, paralelo y **horario** (validando que la hora de fin sea posterior a la de inicio). La coordenada se fija haciendo clic en el mapa, arrastrando el marcador o tomando el GPS del dispositivo. |
+| **Búsqueda de un aula** | Por materia, carrera, bloque o paralelo. Insensible a mayúsculas y acentos: `calculo` encuentra `Cálculo`. Resultados paginados de 5 en 5 y marcados en el mapa. |
+| **Búsqueda de un docente** | Escribir el nombre devuelve **todas las clases que dicta**, cada una con su materia, paralelo, horario y ubicación en el mapa. Es lo que permite ubicarlo aunque la materia en la que está ahora no sea la que uno cursa. |
+| **Detalle** | Panel inferior con todos los datos del aula: materia, docente, carrera, bloque, paralelo y horario, más el acceso a la ruta. |
+| **Ruta a pie** | Trazado por calles reales con seguimiento del GPS en vivo, distancia, tiempo estimado y recálculo automático al alejarse más de 25 m del punto donde se calculó. |
 | **Entrega a Google Maps** | Botón para abrir la navegación paso a paso en la app de Google Maps. |
 | **Tiempo real** | Un aula registrada desde un dispositivo aparece en los demás sin recargar (listener de Firestore). |
 | **Accesibilidad** | Mapa navegable con teclado (flechas y `+`/`-`), etiquetas ARIA, foco gestionado en diálogos. |
@@ -84,11 +106,17 @@ pantalla principal es el mapa, no un menú.
 
 Se dejó fuera de forma deliberada, no por olvido:
 
+- **Decir automáticamente "el docente está aquí ahora".** La app muestra sus
+  clases con su horario y el usuario compara con la hora; no cruza el horario
+  con el reloj para señalar una sola. Es el siguiente paso natural, y es
+  pequeño.
 - **Editar y borrar aulas desde la interfaz.** Las operaciones existen en
   `LocationService` pero no se expusieron: sin roles de usuario, cualquiera
   podría borrar el trabajo de otro. La UI llega cuando existan los permisos.
 - **Roles y permisos** (estudiante / docente / administrador). Hoy todo
   usuario autenticado tiene las mismas capacidades.
+- **Seguimiento de personas.** No se rastrea a ningún docente ni se comparte
+  su posición: solo se muestra el aula y el horario que ya son públicos.
 - **Navegación paso a paso con voz e indicaciones giro a giro.** Se delega en
   Google Maps en lugar de reimplementarla.
 - **Rutas dentro de los edificios.** La ruta termina en la puerta; no hay
@@ -180,8 +208,9 @@ graph TB
    decide nada (`isReady`).
 3. Con sesión activa, `LocationService` abre el listener de `locations` y las
    aulas llegan por WebSocket.
-4. El usuario escribe `fisica`; `filtrarUbicaciones` normaliza acentos y filtra
-   en memoria — sin ida y vuelta a la red, porque el conjunto es pequeño.
+4. El usuario escribe `fisica` —o el apellido de un docente, que devuelve
+   todas sus clases—; `filtrarUbicaciones` normaliza acentos y filtra en
+   memoria, sin ida y vuelta a la red, porque el conjunto es pequeño.
 5. Al elegir un resultado se abre el detalle y, con "Cómo llegar",
    `NavegacionService` arranca `watchPosition`.
 6. Cada lectura del GPS que se aleje más de 25 m del último punto calculado
