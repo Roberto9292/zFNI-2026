@@ -8,7 +8,7 @@ Módulo I · Trabajo Final — Análisis, construcción y publicación.
 
 - **App en Firebase:** https://fni-2026.web.app
 - **Repositorio:** https://github.com/Roberto9292/zFNI-2026
-- **Video explicativo:** _(añade aquí el enlace al video)_
+- **Video explicativo:** [Ver presentación en Google Drive](https://drive.google.com/drive/folders/15gP-V2YTY3B7HdCkRDgj1FYDOe2hvWLe?usp=drive_link)
 - **Autor:** Roberto Pablo Ugarte Gutierrez
 
 ## Capturas
