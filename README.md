@@ -1,10 +1,6 @@
 # FNI Go — Aulas del campus
 
-Aplicación web para **encontrar aulas y docentes** dentro de la Ciudad
-Universitaria de la Facultad Nacional de Ingeniería (UTO, Oruro). Se busca una
-materia —o el nombre de un docente, que devuelve todas las clases que dicta con
-su horario— y la aplicación la sitúa en el mapa del campus y traza la ruta a
-pie hasta ella sobre calles reales.
+Aplicación web SPA para **localizar aulas y docentes** dentro de la Ciudad Universitaria de la Facultad Nacional de Ingeniería (UTO, Oruro). Mediante un **buscador inteligente multicriterio**, el usuario puede ingresar términos combinados y desordenados (ej. `calculo perez bloque b`) para encontrar cualquier clase. La plataforma sitúa la ubicación exacta en un mapa interactivo personalizado y traza la ruta óptima en tiempo real (a pie o en vehículo) desde el GPS del estudiante hasta el destino utilizando la topología de calles reales.
 
 Módulo I · Trabajo Final — Análisis, construcción y publicación.
 
